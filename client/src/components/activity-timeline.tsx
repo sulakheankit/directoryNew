@@ -303,9 +303,9 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
                                       <div className="mb-2">
                                         <span className="text-xs font-medium text-gray-600">Themes:</span>
                                         <div className="flex flex-wrap gap-1 mt-1">
-                                          {survey.openEndedThemes.map((theme: string, idx: number) => (
+                                          {survey.openEndedThemes.map((theme: any, idx: number) => (
                                             <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                                              {theme}
+                                              {typeof theme === 'string' ? theme : theme.theme || theme.name}
                                             </span>
                                           ))}
                                         </div>
@@ -315,9 +315,9 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
                                       <div>
                                         <span className="text-xs font-medium text-gray-600">Emotions:</span>
                                         <div className="flex flex-wrap gap-1 mt-1">
-                                          {survey.openEndedEmotions.map((emotion: string, idx: number) => (
+                                          {survey.openEndedEmotions.map((emotion: any, idx: number) => (
                                             <span key={idx} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded">
-                                              {emotion}
+                                              {typeof emotion === 'string' ? emotion : emotion.emotion || emotion.name}
                                             </span>
                                           ))}
                                         </div>
