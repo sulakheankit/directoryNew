@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Mail, MessageSquare, Smartphone } from "lucide-react";
+import SurveyDetails from "@/components/survey-details";
 
 interface SurveyHistoryProps {
   contact: ContactWithData;
@@ -190,82 +191,12 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                 // Expanded Details Row
                 expandedRows.has(survey.id) && (
                   <TableRow key={`${survey.id}-expanded`} className="bg-gray-50">
-                    <TableCell colSpan={6} className="px-6 py-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-900 mb-2">Response Details</h4>
-                          <div className="space-y-2 text-sm">
-                            <div>
-                              <span className="font-medium">Participation Method:</span>{' '}
-                              {(survey as any).participatedVia || 'N/A'}
-                            </div>
-                            <div>
-                              <span className="font-medium">Response Time:</span>{' '}
-                              {(survey as any).participatedDate ? 
-                                `${Math.round((new Date((survey as any).participatedDate).getTime() - new Date(survey.sentAt).getTime()) / (1000 * 60 * 60))} hours after sent` : 
-                                'N/A'
-                              }
-                            </div>
-                            <div>
-                              <span className="font-medium">Language:</span> {survey.language}
-                            </div>
-                            <div>
-                              <span className="font-medium">Survey Link:</span>{' '}
-                              {(survey as any).surveyResponseLink ? (
-                                <a href={(survey as any).surveyResponseLink} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
-                                  View Response
-                                </a>
-                              ) : 'N/A'}
-                            </div>
-                          </div>
-                        </div>
-
-                        {(survey as any).driverScores && (
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-900 mb-2">Driver Scores</h4>
-                            <div className="space-y-2 text-sm">
-                              {Object.entries((survey as any).driverScores as any).map(([key, value]) => (
-                                <div key={key}>
-                                  <span className="font-medium">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>{' '}
-                                  <span className="text-gray-600">{value as string}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {survey.openEndedSentiment && (
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-900 mb-2">Feedback Analysis</h4>
-                            <div className="space-y-2 text-sm">
-                              <div>
-                                <span className="font-medium">Sentiment:</span>{' '}
-                                <span className={survey.openEndedSentiment === 'positive' ? 'text-green-600' : survey.openEndedSentiment === 'negative' ? 'text-red-600' : 'text-gray-600'}>
-                                  {survey.openEndedSentiment.charAt(0).toUpperCase() + survey.openEndedSentiment.slice(1)}
-                                </span>
-                              </div>
-                              <div>
-                                <span className="font-medium">Key Themes:</span>{' '}
-                                {Array.isArray(survey.openEndedThemes) ? 
-                                  survey.openEndedThemes.map((theme: any) => 
-                                    typeof theme === 'string' ? theme : (theme.theme || theme.name || theme)
-                                  ).join(', ') : 
-                                  'N/A'
-                                }
-                              </div>
-                              <div>
-                                <span className="font-medium">Emotions:</span>{' '}
-                                {Array.isArray(survey.openEndedEmotions) ? 
-                                  survey.openEndedEmotions.map((emotion: any) => 
-                                    typeof emotion === 'string' ? emotion : (emotion.emotion || emotion.name || emotion)
-                                  ).join(', ') : 
-                                  'N/A'
-                                }
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                    <TableCell colSpan={6} className="px-6 py-6">
+                      <SurveyDetails 
+                        survey={survey} 
+                        contact={contact}
+                        showRelatedActivity={true}
+                      />
                     </TableCell>
                   </TableRow>
                 )

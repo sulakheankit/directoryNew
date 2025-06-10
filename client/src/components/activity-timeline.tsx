@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronDown, ChevronUp, Vote, Headphones, ShoppingCart, Mail } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import SurveyDetails from "@/components/survey-details";
 
 interface ActivityTimelineProps {
   contact: ContactWithData;
@@ -211,11 +212,11 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
                         </TabsContent>
                         
                         <TabsContent value="survey" className="mt-4" onClick={(e) => e.stopPropagation()}>
-                          <div className="space-y-3">
+                          <div className="space-y-4">
                             {item.details.surveys.map((survey: any, index: number) => (
-                              <div key={survey.id} className="border border-gray-200 rounded-lg p-3">
-                                <div className="flex items-center justify-between mb-3">
-                                  <h6 className="text-sm font-medium text-gray-800">{survey.surveyTitle}</h6>
+                              <div key={survey.id}>
+                                <div className="flex items-center justify-between mb-4">
+                                  <h6 className="text-lg font-semibold text-gray-900">{survey.surveyTitle}</h6>
                                   <Badge className={
                                     survey.status === 'Completed' || survey.status === 'completed' 
                                       ? 'bg-green-100 text-green-800' 
@@ -224,109 +225,7 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
                                     {survey.status}
                                   </Badge>
                                 </div>
-                                
-                                <div className="grid grid-cols-2 gap-3 text-xs">
-                                  {survey.channel && (
-                                    <div>
-                                      <span className="font-medium text-gray-600">Channel:</span>
-                                      <span className="text-gray-500 ml-1">{survey.channel}</span>
-                                    </div>
-                                  )}
-                                  {survey.sentAt && (
-                                    <div>
-                                      <span className="font-medium text-gray-600">Sent:</span>
-                                      <span className="text-gray-500 ml-1">
-                                        {new Date(survey.sentAt).toLocaleDateString('en-US', { 
-                                          month: 'short', 
-                                          day: 'numeric', 
-                                          year: 'numeric' 
-                                        })}
-                                      </span>
-                                    </div>
-                                  )}
-                                  {survey.participatedDate && (
-                                    <div>
-                                      <span className="font-medium text-gray-600">Responded:</span>
-                                      <span className="text-gray-500 ml-1">
-                                        {new Date(survey.participatedDate).toLocaleDateString('en-US', { 
-                                          month: 'short', 
-                                          day: 'numeric', 
-                                          year: 'numeric' 
-                                        })}
-                                      </span>
-                                    </div>
-                                  )}
-                                  {survey.participatedVia && (
-                                    <div>
-                                      <span className="font-medium text-gray-600">Participated Via:</span>
-                                      <span className="text-gray-500 ml-1">{survey.participatedVia}</span>
-                                    </div>
-                                  )}
-                                  {survey.openEndedSentiment && (
-                                    <div>
-                                      <span className="font-medium text-gray-600">Sentiment:</span>
-                                      <span className={`ml-1 font-medium ${
-                                        survey.openEndedSentiment === 'positive' ? 'text-green-600' :
-                                        survey.openEndedSentiment === 'negative' ? 'text-red-600' : 'text-yellow-600'
-                                      }`}>
-                                        {survey.openEndedSentiment.charAt(0).toUpperCase() + survey.openEndedSentiment.slice(1)}
-                                      </span>
-                                    </div>
-                                  )}
-                                  {survey.language && (
-                                    <div>
-                                      <span className="font-medium text-gray-600">Language:</span>
-                                      <span className="text-gray-500 ml-1">{survey.language}</span>
-                                    </div>
-                                  )}
-                                </div>
-                                
-                                {/* Metric Scores */}
-                                {survey.metricScores && Object.keys(survey.metricScores).length > 0 && (
-                                  <div className="mt-3 pt-3 border-t border-gray-100">
-                                    <h6 className="text-xs font-medium text-gray-700 mb-2">Metric Scores</h6>
-                                    <div className="grid grid-cols-3 gap-2">
-                                      {Object.entries(survey.metricScores).map(([key, value]) => (
-                                        <div key={key} className="text-center">
-                                          <div className="text-xs text-gray-500">
-                                            {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                          </div>
-                                          <div className="text-sm font-medium text-gray-800">{String(value)}</div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-                                
-                                {/* Themes and Emotions */}
-                                {(survey.openEndedThemes || survey.openEndedEmotions) && (
-                                  <div className="mt-3 pt-3 border-t border-gray-100">
-                                    {survey.openEndedThemes && Array.isArray(survey.openEndedThemes) && survey.openEndedThemes.length > 0 && (
-                                      <div className="mb-2">
-                                        <span className="text-xs font-medium text-gray-600">Themes:</span>
-                                        <div className="flex flex-wrap gap-1 mt-1">
-                                          {survey.openEndedThemes.map((theme: any, idx: number) => (
-                                            <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                                              {typeof theme === 'string' ? theme : theme.theme || theme.name}
-                                            </span>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                    {survey.openEndedEmotions && Array.isArray(survey.openEndedEmotions) && survey.openEndedEmotions.length > 0 && (
-                                      <div>
-                                        <span className="text-xs font-medium text-gray-600">Emotions:</span>
-                                        <div className="flex flex-wrap gap-1 mt-1">
-                                          {survey.openEndedEmotions.map((emotion: any, idx: number) => (
-                                            <span key={idx} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded">
-                                              {typeof emotion === 'string' ? emotion : emotion.emotion || emotion.name}
-                                            </span>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
+                                <SurveyDetails survey={survey} contact={contact} />
                               </div>
                             ))}
                           </div>
