@@ -63,6 +63,35 @@ export default function CustomerDirectory() {
     }
   });
 
+  const deleteAllMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/contacts/all', {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Delete failed');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/contacts'] });
+      toast({
+        title: "Delete Successful",
+        description: data.message,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Delete Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleFileUpload = (file: File) => {
     if (!file) return;
     

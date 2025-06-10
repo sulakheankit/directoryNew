@@ -18,6 +18,9 @@ export interface IStorage {
   // Notes
   getNotesByContactId(contactId: string): Promise<Note[]>;
   createNote(note: InsertNote): Promise<Note>;
+
+  // Bulk operations
+  deleteAllContacts(): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -152,6 +155,19 @@ export class MemStorage implements IStorage {
     
     this.notes.set(newNote.id, newNote);
     return newNote;
+  }
+
+  async deleteAllContacts(): Promise<void> {
+    console.log(`Deleting all contacts and related data...`);
+    console.log(`Before deletion - Contacts: ${this.contacts.size}, Activities: ${this.activities.size}, Surveys: ${this.surveys.size}, Notes: ${this.notes.size}`);
+    
+    this.contacts.clear();
+    this.activities.clear();
+    this.surveys.clear();
+    this.notes.clear();
+    
+    console.log(`After deletion - Contacts: ${this.contacts.size}, Activities: ${this.activities.size}, Surveys: ${this.surveys.size}, Notes: ${this.notes.size}`);
+    console.log("All contacts and related data deleted successfully");
   }
 }
 

@@ -301,6 +301,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete all contacts endpoint
+  app.delete("/api/contacts/all", async (req, res) => {
+    try {
+      await storage.deleteAllContacts();
+      res.json({ message: "All contacts and associated data deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting all contacts:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
