@@ -9,7 +9,7 @@ import SurveyHistory from "@/components/survey-history";
 import NLPInsights from "@/components/nlp-insights";
 import NotesSection from "@/components/notes-section";
 import TimeFilter, { TimeFilterValue } from "@/components/time-filter";
-import { filterByDateRange } from "@/lib/time-filter-utils";
+import { getDateRangeFromFilter } from "@/lib/time-filter-utils";
 import { ArrowLeft, Mail, MoreVertical, User, Phone, MapPin, Tag, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,28 +34,39 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
   const filteredContact = useMemo(() => {
     if (!contact) return null;
 
-    // Convert date strings to Date objects for filtering
-    const activitiesWithDates = contact.activities.map(activity => ({
-      ...activity,
-      createdAt: new Date(activity.createdAt),
-    }));
+    // Simple filtering without type conversions - let components handle date parsing
+    const { start, end } = getDateRangeFromFilter(timeFilter);
+    
+    if (!start && !end) {
+      return contact; // No filtering needed
+    }
 
-    const surveysWithDates = contact.surveys.map(survey => ({
-      ...survey,
-      participationDate: survey.participationDate ? new Date(survey.participationDate) : undefined,
-      sentAt: survey.sentAt ? new Date(survey.sentAt) : undefined,
-    }));
+    const isInRange = (dateStr: string | Date | null | undefined) => {
+      if (!dateStr) return true;
+      const date = new Date(dateStr);
+      if (!start && !end) return true;
+      if (!start) return date <= end!;
+      if (!end) return date >= start;
+      return date >= start && date <= end;
+    };
 
-    const notesWithDates = contact.notes.map(note => ({
-      ...note,
-      createdAt: new Date(note.createdAt),
-    }));
+    const filteredActivities = contact.activities.filter(activity => 
+      isInRange(activity.createdAt)
+    );
+
+    const filteredSurveys = contact.surveys.filter(survey => 
+      isInRange(survey.participationDate) || isInRange(survey.sentAt)
+    );
+
+    const filteredNotes = contact.notes.filter(note => 
+      isInRange(note.createdAt)
+    );
 
     return {
       ...contact,
-      activities: filterByDateRange(activitiesWithDates, timeFilter),
-      surveys: filterByDateRange(surveysWithDates, timeFilter),
-      notes: filterByDateRange(notesWithDates, timeFilter),
+      activities: filteredActivities,
+      surveys: filteredSurveys,
+      notes: filteredNotes,
     };
   }, [contact, timeFilter]);
 
@@ -353,7 +364,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                     <div>
                       <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
                       <div className="space-y-4">
-                        {contact.activities.slice(0, 3).map((activity) => (
+                        {(filteredContact?.activities || []).slice(0, 3).map((activity) => (
                           <div key={activity.id} className="flex items-start space-x-3">
                             <div className="flex-shrink-0">
                               <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center border border-gray-300">
@@ -379,19 +390,19 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                 </TabsContent>
 
                 <TabsContent value="activity" className="mt-0">
-                  <ActivityTimeline contact={contact} />
+                  {filteredContact && <ActivityTimeline contact={filteredContact} />}
                 </TabsContent>
 
                 <TabsContent value="surveys" className="mt-0">
-                  <SurveyHistory contact={contact} />
+                  {filteredContact && <SurveyHistory contact={filteredContact} />}
                 </TabsContent>
 
                 <TabsContent value="insights" className="mt-0">
-                  <NLPInsights contact={contact} />
+                  {filteredContact && <NLPInsights contact={filteredContact} />}
                 </TabsContent>
 
                 <TabsContent value="notes" className="mt-0">
-                  <NotesSection contact={contact} />
+                  {filteredContact && <NotesSection contact={filteredContact} />}
                 </TabsContent>
               </div>
             </Tabs>

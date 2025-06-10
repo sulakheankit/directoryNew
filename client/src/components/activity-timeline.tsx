@@ -25,7 +25,6 @@ interface TimelineItem {
 export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("");
 
   const toggleExpanded = (id: string) => {
     const newExpanded = new Set(expandedItems);
@@ -101,9 +100,6 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
     if (filter !== "all" && !item.title.toLowerCase().includes(filter.toLowerCase())) {
       return false;
     }
-    if (dateFilter && !item.date.toISOString().split('T')[0].includes(dateFilter)) {
-      return false;
-    }
     return true;
   });
 
@@ -123,12 +119,6 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
               <SelectItem value="sales">Sales</SelectItem>
             </SelectContent>
           </Select>
-          <Input 
-            type="date" 
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="w-40"
-          />
         </div>
       </div>
 
