@@ -1,4 +1,4 @@
-import { contacts, activities, surveys, notes, type Contact, type Activity, type Survey, type Note, type InsertContact, type InsertActivity, type InsertSurvey, type InsertNote, type ContactWithData } from "@shared/schema";
+import { Contact, Activity, Survey, Note, InsertContact, InsertActivity, InsertSurvey, InsertNote, ContactWithData } from "@shared/schema";
 
 export interface IStorage {
   // Contacts
@@ -35,231 +35,7 @@ export class MemStorage implements IStorage {
   }
 
   private initializeMockData() {
-    // Sample contact
-    const contact: Contact = {
-      id: "contact_001",
-      directory: "Enterprise Customers",
-      directoryFields: {
-        name: "Sarah Johnson",
-        email: "sarah.johnson@techcorp.com",
-        phone: "+1-555-0101",
-        company: "TechCorp Inc",
-        role: "VP Marketing",
-        industry: "Technology",
-        annual_revenue: 250000,
-        location: "San Francisco, CA",
-        join_date: "2023-01-15",
-        segment: "Enterprise"
-      },
-      createdAt: new Date("2023-01-15"),
-      updatedAt: new Date()
-    };
-
-    // Sample activities
-    const activity1: Activity = {
-      id: "act_001",
-      contactId: "contact_001",
-      activity: "Customer Satisfaction Survey",
-      activityFields: {
-        survey_id: "SUR-2024-003",
-        category: "Feedback"
-      },
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
-    };
-
-    const activity2: Activity = {
-      id: "act_002",
-      contactId: "contact_001",
-      activity: "Support Ticket",
-      activityFields: {
-        ticket_id: "SUP-2024-001",
-        category: "Technical Support",
-        priority: "Medium"
-      },
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 1 week ago
-    };
-
-    const activity3: Activity = {
-      id: "act_003",
-      contactId: "contact_001",
-      activity: "Purchase",
-      activityFields: {
-        order_id: "ORD-2024-0158",
-        product: "Enterprise License Renewal",
-        amount: 25000,
-        payment_method: "Bank Transfer"
-      },
-      createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) // 2 weeks ago
-    };
-
-    // Sample surveys
-    const survey1: Survey = {
-      id: "sur_001",
-      contactId: "contact_001",
-      activityId: "act_001",
-      surveyTitle: "Customer Satisfaction Survey",
-      feedbackRecipient: { name: "Sarah Johnson", email: "sarah.johnson@techcorp.com" },
-      channel: "Email",
-      sentAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      language: "English",
-      status: "Completed",
-      participationMethod: "Email Link",
-      participationDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 4 * 60 * 60 * 1000), // 4 hours after sent
-      surveyResponseLink: "https://survey.example.com/response/12345",
-      metricScores: {
-        nps: 9,
-        csat: 4.8,
-        ces: 3.2
-      },
-      driverScores: {
-        product_quality: 5,
-        support_experience: 4.5,
-        pricing: 3.8
-      },
-      openEndedSentiment: "positive",
-      openEndedThemes: ["Product Quality", "Support Experience"],
-      openEndedEmotions: ["Satisfaction", "Trust"]
-    };
-
-    const survey2: Survey = {
-      id: "sur_002",
-      contactId: "contact_001",
-      activityId: null,
-      surveyTitle: "Product Feedback Survey",
-      feedbackRecipient: { name: "Sarah Johnson", email: "sarah.johnson@techcorp.com" },
-      channel: "SMS",
-      sentAt: new Date(Date.now() - 19 * 24 * 60 * 60 * 1000),
-      language: "English",
-      status: "Read",
-      participationMethod: null,
-      participationDate: null,
-      surveyResponseLink: "https://survey.example.com/response/12346",
-      metricScores: null,
-      driverScores: null,
-      openEndedSentiment: null,
-      openEndedThemes: null,
-      openEndedEmotions: null
-    };
-
-    // Additional sample contacts for the directory
-    const contact2: Contact = {
-      id: "contact_002",
-      directory: "Enterprise Customers",
-      directoryFields: {
-        name: "Timothy Sullivan",
-        email: "timothy.sullivan@gmail.com",
-        phone: "+1-976-432468",
-        company: "TechCorp Inc",
-        role: "Manager",
-        industry: "Technology",
-        annual_revenue: 150000,
-        location: "Lindleyburg, Colorado",
-        join_date: "2022-06-15",
-        segment: "Enterprise"
-      },
-      createdAt: new Date("2022-06-15"),
-      updatedAt: new Date()
-    };
-
-    const contact3: Contact = {
-      id: "contact_003",
-      directory: "Enterprise Customers", 
-      directoryFields: {
-        name: "Holly Caldwell",
-        email: "holly.caldwell@johnson-taylor.org",
-        phone: "+1-976-432469",
-        company: "Johnson Taylor Org",
-        role: "Director",
-        industry: "Consulting",
-        annual_revenue: 120000,
-        location: "West Darrylland, Nevada",
-        join_date: "2021-03-20",
-        segment: "Premium"
-      },
-      createdAt: new Date("2021-03-20"),
-      updatedAt: new Date()
-    };
-
-    const contact4: Contact = {
-      id: "contact_004",
-      directory: "Enterprise Customers",
-      directoryFields: {
-        name: "Kayla Coleman",
-        email: "kayla.coleman@email.com",
-        phone: "+1-976-432465",
-        company: "Coleman Enterprises",
-        role: "VP Sales",
-        industry: "Sales",
-        annual_revenue: 180000,
-        location: "East Curtis, Nebraska",
-        join_date: "2023-04-10",
-        segment: "Enterprise"
-      },
-      createdAt: new Date("2023-04-10"),
-      updatedAt: new Date()
-    };
-
-    const contact5: Contact = {
-      id: "contact_005",
-      directory: "Enterprise Customers",
-      directoryFields: {
-        name: "Jeff Curtis",
-        email: "jeff.curtis@cooke.com",
-        phone: "+1-976-432385",
-        company: "Cooke Industries",
-        role: "Senior Manager",
-        industry: "Manufacturing",
-        annual_revenue: 220000,
-        location: "West Jason, Alabama",
-        join_date: "2020-12-05",
-        segment: "Enterprise"
-      },
-      createdAt: new Date("2020-12-05"),
-      updatedAt: new Date()
-    };
-
-    // Sample notes
-    const note1: Note = {
-      id: "note_001",
-      contactId: "contact_001",
-      content: "High-value customer showing interest in additional services. Follow up on enterprise package upgrade opportunities.",
-      authorName: "John Doe",
-      authorInitials: "JD",
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
-    };
-
-    const note2: Note = {
-      id: "note_002",
-      contactId: "contact_001",
-      content: "Resolved technical issue with API integration. Customer very satisfied with support response time.",
-      authorName: "Mike Smith",
-      authorInitials: "MS",
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    };
-
-    const note3: Note = {
-      id: "note_003",
-      contactId: "contact_001",
-      content: "Completed successful license renewal. Expressed interest in training services for new team members.",
-      authorName: "Alice Lee",
-      authorInitials: "AL",
-      createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
-    };
-
-    // Store data
-    this.contacts.set(contact.id, contact);
-    this.contacts.set(contact2.id, contact2);
-    this.contacts.set(contact3.id, contact3);
-    this.contacts.set(contact4.id, contact4);
-    this.contacts.set(contact5.id, contact5);
-    this.activities.set(activity1.id, activity1);
-    this.activities.set(activity2.id, activity2);
-    this.activities.set(activity3.id, activity3);
-    this.surveys.set(survey1.id, survey1);
-    this.surveys.set(survey2.id, survey2);
-    this.notes.set(note1.id, note1);
-    this.notes.set(note2.id, note2);
-    this.notes.set(note3.id, note3);
+    // Empty storage - no sample data
   }
 
   async getContact(id: string): Promise<Contact | undefined> {
@@ -274,57 +50,40 @@ export class MemStorage implements IStorage {
     const surveys = await this.getSurveysByContactId(id);
     const notes = await this.getNotesByContactId(id);
 
-    // Mock communication metrics
-    const communicationMetrics = {
-      emailReadRate: 89,
-      responseRate: 72,
-      lastContact: "2 days ago"
-    };
-
-    // Mock tags
-    const tags = [
-      { type: 'system' as const, label: 'High Value', color: 'green' },
-      { type: 'system' as const, label: 'Promoter', color: 'blue' },
-      { type: 'ai' as const, label: 'Enterprise', color: 'purple' },
-      { type: 'ai' as const, label: 'Frequent Buyer', color: 'orange' }
-    ];
-
-    // Mock NLP insights
-    const nlpInsights = {
-      overallSentiment: 'positive' as const,
-      confidence: 85,
-      themes: ['Product Quality', 'Support', 'Pricing'],
-      emotions: ['Trust', 'Satisfaction', 'Loyalty'],
-      analysis: [
-        {
-          theme: 'Product Quality',
-          sentiment: 'positive' as const,
-          quote: 'The product exceeded my expectations. Very reliable and user-friendly interface.',
-          emotions: ['Satisfaction', 'Quality']
-        },
-        {
-          theme: 'Support Experience',
-          sentiment: 'positive' as const,
-          quote: 'Customer support was incredibly helpful and resolved my issue quickly.',
-          emotions: ['Gratitude', 'Support']
-        },
-        {
-          theme: 'Pricing',
-          sentiment: 'neutral' as const,
-          quote: 'The pricing is fair for the value provided, though could be more competitive.',
-          emotions: ['Consideration', 'Pricing']
-        }
-      ]
-    };
-
     return {
       ...contact,
       activities,
       surveys,
       notes,
-      communicationMetrics,
-      tags,
-      nlpInsights
+      communicationMetrics: {
+        emailReadRate: 0.85,
+        responseRate: 0.72,
+        lastContact: "2024-01-20",
+      },
+      tags: [
+        { type: 'ai', label: 'High Value', color: 'green' },
+        { type: 'system', label: 'Enterprise', color: 'blue' }
+      ],
+      nlpInsights: {
+        overallSentiment: 'positive',
+        confidence: 0.89,
+        themes: ['satisfaction', 'value', 'support'],
+        emotions: ['satisfaction', 'trust'],
+        analysis: [
+          {
+            theme: 'Product Quality',
+            sentiment: 'positive',
+            quote: 'The product quality exceeds our expectations',
+            emotions: ['satisfaction', 'trust']
+          },
+          {
+            theme: 'Support Experience',
+            sentiment: 'positive', 
+            quote: 'Support team was very responsive and helpful',
+            emotions: ['relief', 'confidence']
+          }
+        ]
+      }
     };
   }
 
@@ -332,28 +91,31 @@ export class MemStorage implements IStorage {
     const newContact: Contact = {
       ...contact,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
+    
     this.contacts.set(newContact.id, newContact);
     return newContact;
   }
 
   async getAllContacts(): Promise<Contact[]> {
-    return Array.from(this.contacts.values());
+    return Array.from(this.contacts.values()).sort((a, b) => 
+      b.createdAt.getTime() - a.createdAt.getTime()
+    );
   }
 
   async getActivitiesByContactId(contactId: string): Promise<Activity[]> {
     return Array.from(this.activities.values())
       .filter(activity => activity.contactId === contactId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   async createActivity(activity: InsertActivity): Promise<Activity> {
     const newActivity: Activity = {
       ...activity,
-      activityFields: activity.activityFields || {},
-      createdAt: new Date()
+      createdAt: new Date(),
     };
+    
     this.activities.set(newActivity.id, newActivity);
     return newActivity;
   }
@@ -361,24 +123,16 @@ export class MemStorage implements IStorage {
   async getSurveysByContactId(contactId: string): Promise<Survey[]> {
     return Array.from(this.surveys.values())
       .filter(survey => survey.contactId === contactId)
-      .sort((a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime());
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   async createSurvey(survey: InsertSurvey): Promise<Survey> {
     const newSurvey: Survey = {
       ...survey,
-      activityId: survey.activityId || null,
-      feedbackRecipient: survey.feedbackRecipient || {},
-      language: survey.language || "English",
-      participationMethod: survey.participationMethod || null,
-      participationDate: survey.participationDate || null,
-      surveyResponseLink: survey.surveyResponseLink || null,
-      metricScores: survey.metricScores || null,
-      driverScores: survey.driverScores || null,
-      openEndedSentiment: survey.openEndedSentiment || null,
-      openEndedThemes: survey.openEndedThemes || null,
-      openEndedEmotions: survey.openEndedEmotions || null
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
+    
     this.surveys.set(newSurvey.id, newSurvey);
     return newSurvey;
   }
@@ -386,14 +140,16 @@ export class MemStorage implements IStorage {
   async getNotesByContactId(contactId: string): Promise<Note[]> {
     return Array.from(this.notes.values())
       .filter(note => note.contactId === contactId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   async createNote(note: InsertNote): Promise<Note> {
     const newNote: Note = {
       ...note,
-      createdAt: new Date()
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
+    
     this.notes.set(newNote.id, newNote);
     return newNote;
   }

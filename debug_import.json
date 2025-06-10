@@ -1,0 +1,36 @@
+[
+  {
+    "id": "rec_001",
+    "contact_id": "contact_001",
+    "directory": "Enterprise Customers",
+    "directory_fields": {
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@techcorp.com",
+      "phone": "+1-555-0101",
+      "company": "TechCorp Inc",
+      "role": "VP Marketing",
+      "industry": "Technology",
+      "annual_revenue": 250000,
+      "location": "San Francisco, CA",
+      "join_date": "2023-01-15",
+      "segment": "Enterprise"
+    }
+  },
+  {
+    "id": "rec_002",
+    "contact_id": "contact_002",
+    "directory": "SMB Customers",
+    "directory_fields": {
+      "name": "Mike Thompson",
+      "email": "mike@designstudio.com",
+      "phone": "+1-555-0202",
+      "company": "Creative Design Studio",
+      "role": "Owner",
+      "industry": "Design",
+      "annual_revenue": 85000,
+      "location": "Austin, TX",
+      "join_date": "2023-06-10",
+      "segment": "SMB"
+    }
+  }
+]
