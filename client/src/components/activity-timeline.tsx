@@ -109,10 +109,10 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
   }).sort((a, b) => b.date.getTime() - a.date.getTime());
 
   const filteredItems = timelineItems.filter(item => {
-    if (filter !== "all" && !item.title.toLowerCase().includes(filter.toLowerCase())) {
-      return false;
+    if (filter === "all") {
+      return true;
     }
-    return true;
+    return item.title.toLowerCase() === filter.toLowerCase();
   });
 
   return (
