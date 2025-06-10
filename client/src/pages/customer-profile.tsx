@@ -198,9 +198,10 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <Button>
-              Send Survey
-            </Button>
+            <TimeFilter 
+              value={timeFilter} 
+              onChange={setTimeFilter}
+            />
             <Button variant="ghost" size="sm">
               <MoreVertical className="h-4 w-4" />
             </Button>
@@ -208,12 +209,12 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
         </div>
       </header>
 
-      <main className="p-6">
-        <div className="w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <main className="p-6 h-[calc(100vh-120px)]">
+        <div className="w-full h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full">
             {/* Left Panel - Contact Info */}
             <div className="lg:col-span-1">
-              <Card>
+              <Card className="h-full flex flex-col">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg font-medium">Contact Info</CardTitle>
@@ -240,7 +241,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                     </DropdownMenu>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 flex-1 overflow-y-auto">
                   {contactFields
                     .filter(field => !hiddenFields.has(field.key))
                     .map((field) => (
@@ -270,15 +271,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
             </div>
 
             {/* Right Panel - Main Content */}
-            <div className="lg:col-span-3">
-              {/* Time Filter */}
-              <div className="flex justify-between items-center mb-6">
-                <div></div>
-                <TimeFilter 
-                  value={timeFilter} 
-                  onChange={setTimeFilter}
-                />
-              </div>
+            <div className="lg:col-span-4 h-full flex flex-col">
 
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -382,7 +375,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                 </Card>
               </div>
 
-              <Tabs defaultValue="activity" className="w-full">
+              <Tabs defaultValue="activity" className="w-full flex-1 flex flex-col">
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="activity">Activity Timeline</TabsTrigger>
                   <TabsTrigger value="surveys">Survey History</TabsTrigger>
@@ -390,19 +383,19 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                   <TabsTrigger value="notes">Notes</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="activity" className="space-y-6 mt-6">
+                <TabsContent value="activity" className="space-y-6 mt-6 flex-1 overflow-y-auto">
                   {filteredContact && <ActivityTimeline contact={filteredContact} />}
                 </TabsContent>
 
-                <TabsContent value="surveys" className="space-y-6 mt-6">
+                <TabsContent value="surveys" className="space-y-6 mt-6 flex-1 overflow-y-auto">
                   {filteredContact && <SurveyHistory contact={filteredContact} />}
                 </TabsContent>
 
-                <TabsContent value="insights" className="space-y-6 mt-6">
+                <TabsContent value="insights" className="space-y-6 mt-6 flex-1 overflow-y-auto">
                   {filteredContact && <NLPInsights contact={filteredContact} />}
                 </TabsContent>
 
-                <TabsContent value="notes" className="space-y-6 mt-6">
+                <TabsContent value="notes" className="space-y-6 mt-6 flex-1 overflow-y-auto">
                   {filteredContact && <NotesSection contact={filteredContact} />}
                 </TabsContent>
               </Tabs>
