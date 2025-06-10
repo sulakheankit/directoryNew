@@ -81,9 +81,11 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Surveys</SelectItem>
-              <SelectItem value="customer satisfaction">Customer Satisfaction</SelectItem>
-              <SelectItem value="product feedback">Product Feedback</SelectItem>
-              <SelectItem value="support experience">Support Experience</SelectItem>
+              {Array.from(new Set(contact.surveys.map(survey => survey.surveyTitle))).map(surveyTitle => (
+                <SelectItem key={surveyTitle} value={surveyTitle.toLowerCase()}>
+                  {surveyTitle}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           
@@ -93,9 +95,11 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Channels</SelectItem>
-              <SelectItem value="email">Email</SelectItem>
-              <SelectItem value="sms">SMS</SelectItem>
-              <SelectItem value="app">App</SelectItem>
+              {Array.from(new Set(contact.surveys.map(survey => survey.channel))).map(channel => (
+                <SelectItem key={channel} value={channel.toLowerCase()}>
+                  {channel}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           
@@ -105,10 +109,11 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="sent">Sent</SelectItem>
-              <SelectItem value="read">Read</SelectItem>
-              <SelectItem value="bounced">Bounced</SelectItem>
+              {Array.from(new Set(contact.surveys.map(survey => survey.status))).map(status => (
+                <SelectItem key={status} value={status.toLowerCase()}>
+                  {status}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

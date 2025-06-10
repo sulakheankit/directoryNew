@@ -41,6 +41,37 @@ export class MemStorage implements IStorage {
     // Empty storage - no sample data
   }
 
+  private calculateCommunicationMetrics(surveys: Survey[]) {
+    // Email Read Rate calculation
+    const emailSurveys = surveys.filter(s => s.channel.toLowerCase() === 'email');
+    const readStatuses = ['email read', 'not participated', 'complete', 'incomplete'];
+    const emailReadCount = emailSurveys.filter(s => 
+      readStatuses.some(status => s.status.toLowerCase() === status.toLowerCase())
+    ).length;
+    const emailReadRate = emailSurveys.length > 0 ? emailReadCount / emailSurveys.length : 0;
+
+    // Response Rate calculation - surveys sent via Email, SMS, or Email and SMS
+    const responseSurveys = surveys.filter(s => 
+      ['email', 'sms', 'email and sms'].includes(s.channel.toLowerCase())
+    );
+    const completedSurveys = responseSurveys.filter(s => 
+      s.status.toLowerCase() === 'complete'
+    );
+    const responseRate = responseSurveys.length > 0 ? completedSurveys.length / responseSurveys.length : 0;
+
+    // Last Contact calculation
+    const sortedSurveys = surveys.sort((a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime());
+    const lastContact = sortedSurveys.length > 0 
+      ? new Date(sortedSurveys[0].sentAt).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0];
+
+    return {
+      emailReadRate,
+      responseRate,
+      lastContact
+    };
+  }
+
   async getContact(id: string): Promise<Contact | undefined> {
     return this.contacts.get(id);
   }
@@ -58,11 +89,7 @@ export class MemStorage implements IStorage {
       activities,
       surveys,
       notes,
-      communicationMetrics: {
-        emailReadRate: 0.85,
-        responseRate: 0.72,
-        lastContact: "2024-01-20",
-      },
+      communicationMetrics: this.calculateCommunicationMetrics(surveys.slice()),
       tags: [
         { type: 'ai', label: 'High Value', color: 'green' },
         { type: 'system', label: 'Enterprise', color: 'blue' }
