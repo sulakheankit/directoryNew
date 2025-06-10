@@ -160,22 +160,12 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                   </TableCell>
                   <TableCell className="px-6 py-4">
                     {survey.metricScores ? (
-                      <div className="flex space-x-2">
-                        {(survey.metricScores as any).nps_score && (
-                          <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            NPS: {(survey.metricScores as any).nps_score}
+                      <div className="flex space-x-2 flex-wrap">
+                        {Object.entries(survey.metricScores as any).slice(0, 2).map(([key, value]) => (
+                          <Badge key={key} variant="secondary" className="bg-blue-100 text-blue-800 mb-1">
+                            {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}: {value as string}
                           </Badge>
-                        )}
-                        {(survey.metricScores as any).csat_score && (
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                            CSAT: {(survey.metricScores as any).csat_score}
-                          </Badge>
-                        )}
-                        {(survey.metricScores as any).ease_of_purchase && (
-                          <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                            EOP: {(survey.metricScores as any).ease_of_purchase}
-                          </Badge>
-                        )}
+                        ))}
                       </div>
                     ) : (
                       <span className="text-xs text-gray-500">Not Completed</span>

@@ -226,26 +226,25 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                     
                     const metrics = completedSurvey.metricScores as any;
                     
+                    // Get the first 3 metrics dynamically from whatever is available
+                    const metricEntries = Object.entries(metrics || {}).slice(0, 3);
+                    
+                    if (metricEntries.length === 0) {
+                      return <p className="text-sm text-gray-500">No metric scores available</p>;
+                    }
+                    
                     return (
                       <>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">NPS</span>
-                          <span className="text-lg font-semibold text-gray-900">
-                            {metrics?.nps_score || metrics?.nps || 'N/A'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">CSAT</span>
-                          <span className="text-lg font-semibold text-gray-900">
-                            {metrics?.csat_score || metrics?.csat || 'N/A'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Ease of Purchase</span>
-                          <span className="text-lg font-semibold text-gray-900">
-                            {metrics?.ease_of_purchase || metrics?.eop || 'N/A'}
-                          </span>
-                        </div>
+                        {metricEntries.map(([key, value]) => (
+                          <div key={key} className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">
+                              {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </span>
+                            <span className="text-lg font-semibold text-gray-900">
+                              {value as string}
+                            </span>
+                          </div>
+                        ))}
                       </>
                     );
                   })()}
