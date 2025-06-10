@@ -1,0 +1,162 @@
+Objective:
+Design a Customer Profile View within a Contact Directory in an Experience Management tool. This view will consolidate and visualize contact-related data for better engagement analysis and decision-making.
+
+Key Features:
+1. Contact Attributes
+Display demographic and custom attributes for each contact (from Directory Fields).
+
+Example: name, email, phone, role, industry, annual revenue, location, segment, etc.
+
+2. Associated Activities (Timeline View)
+Chronological timeline of all business interactions (Activities) linked to the contact.
+
+Each timeline entry includes:
+
+Activity Name
+
+Activity Fields (e.g., ticket ID, session details)
+
+Survey Response Link (if applicable)
+
+Feedback Recipient (if mapped)
+
+Activities may or may not be linked to surveys.
+
+3. Survey History Table (Merged Invites + Responses)
+Shows a combined history of all survey invitations and responses.
+
+Columns:
+
+Survey Title
+
+Survey ID
+
+Activity Name (if applicable)
+
+Feedback Recipient (if applicable)
+
+Channel (Email, SMS)
+
+Sent At
+
+Status (Sent, Read, Completed, Bounced, etc.)
+
+Participation Method (Email, SMS, QR Code, App, etc.)
+
+Participation Date
+
+Response Link
+
+Metric Scores (NPS, CSAT, CES, or custom metrics)
+
+Driver Scores
+
+Open-Ended Sentiment
+
+Themes & Emotions (extracted via NLP)
+
+4. Communication Metrics
+Email Read Rate
+
+Response Rate by Channel (Email/SMS)
+
+5. Manual Notes
+Free-text section for internal team members to log additional insights or comments.
+
+6. AI-Generated Tags
+Tags inferred from patterns:
+
+Frequent Buyer, At Risk, High Value, etc.
+
+7. System-Generated Tags
+Tags from system-defined rules, e.g.,:
+
+Promoter / Passive / Detractor
+
+Satisfied / Dissatisfied
+
+8. NLP Insights
+Analyze open-ended feedback over time:
+
+Overall Sentiment
+
+Emerging Themes
+
+Detected Emotions
+
+Input Format Support
+a. CSV Format
+A single flat-file CSV supporting all fields (with conditional optionality).
+
+Column	Required/Optional	Optional When
+Contact ID	Required	Never
+Directory	Required	Never
+Directory Fields (JSONb)	Required	Never
+Activity	Optional	When no survey is sent
+Activity Fields (JSONb)	Optional	When no survey is sent
+Feedback Recipient (JSONb)	Optional	When no survey is sent
+Survey ID	Optional	When no survey is sent
+Survey Title	Optional	When no survey is sent
+Channel	Optional	When no survey is sent
+Sent At	Optional	When no survey is sent
+Language	Optional	When no survey is sent
+Status	Optional	When no survey is sent
+Participation Method	Optional	When no survey is sent
+Participation Date	Optional	When no survey is sent
+Survey Response Link	Optional	When no survey is sent
+Metric Scores (JSONb)	Optional	When no survey is sent
+Driver Scores (JSONb)	Optional	When no survey is sent
+Open-Ended Sentiment	Optional	When no survey is sent
+Open-Ended Themes (JSONb)	Optional	When no survey is sent
+Open-Ended Emotions (JSONb)	Optional	When no survey is sent
+
+b. JSON Format
+Supports bulk ingestion using structured JSON objects. See earlier example structure for format.
+{ "id": "rec_002", "contact_id": "contact_001", "directory": "Enterprise Customers", "directory_fields": { "name": "Sarah Johnson", "email": "sarah.johnson@techcorp.com", "phone": "+1-555-0101", "company": "TechCorp Inc", "role": "VP Marketing", "industry": "Technology", "annual_revenue": 250000, "location": "San Francisco, CA", "join_date": "2023-01-15", "segment": "Enterprise" }, "activity": "Support Ticket", "activity_fields": { "ticket_id": "SUP-2024-001", "category": "Technical", "priority": "High", "resolution_time": 4.5, "agent": "Lisa Wong" }, "feedback_recipient": { "id": "team_support", "name": "Customer Support", "type": "team", "email": "support@company.com" } }, { "id": "rec_003", "contact_id": "contact_001", "directory": "Enterprise Customers", "directory_fields": { "name": "Sarah Johnson", "email": "sarah.johnson@techcorp.com", "phone": "+1-555-0101", "company": "TechCorp Inc", "role": "VP Marketing", "industry": "Technology", "annual_revenue": 250000, "location": "San Francisco, CA", "join_date": "2023-01-15", "segment": "Enterprise" }, "activity": "Training Session", "activity_fields": { "session_type": "Advanced Features", "duration": 120, "attendees": 8, "trainer": "Alex Rodriguez", "completion_rate": 100 }, "feedback_recipient": { "id": "team_training", "name": "Training Team", "type": "team", "email": "training@company.com" }, "survey_id": "survey_training_feedback", "survey_title": "Training Session Feedback", "channel": "sms", "sent_at": "2024-02-15T16:00:00Z", "language": "en", "status": "completed", "participated_via": "sms", "participated_date": "2024-02-15T18:45:00Z", "survey_response_link": "https://surveys.company.com/r/tr001", "metrics_and_custom_metrics": { "training_satisfaction": 8, "content_quality": 9, "trainer_effectiveness": 8, "likelihood_to_recommend": 9 }, "driver_scores": { "content_relevance": 9, "trainer_knowledge": 8, "session_pace": 7, "materials_quality": 8 }, "open_ended_sentiment": "positive", "open_ended_themes": [ {"theme": "comprehensive_content", "confidence": 0.85}, {"theme": "knowledgeable_trainer", "confidence": 0.90} ], "open_ended_emotions": [ {"emotion": "engagement", "intensity": 0.8, "confidence": 0.82} ] }
+UX Recommendations:
+Components:
+Profile Summary Card: Core contact info, tags, communication metrics.
+
+Tabbed Layout:
+
+Overview
+
+Activity Timeline
+
+Survey History
+
+NLP Insights
+
+Notes
+
+Timeline View:
+
+Scrollable vertical timeline with expandable activity cards.
+
+Survey History Table:
+
+Filterable and sortable (e.g., by date, status, channel).
+
+Expandable rows to view metrics and open-ended themes.
+
+Filters:
+
+Date Range
+
+Survey Title
+
+Channel
+
+Status
+
+Activity Name
+
+Feedback Recipient
+
+Visual Cues:
+
+Color-coded statuses (Completed, Read, Bounced)
+
+Icons for channels and sentiment
+
+Tag chips for quick scanning
