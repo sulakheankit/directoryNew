@@ -7,7 +7,7 @@ import ActivityTimeline from "@/components/activity-timeline";
 import SurveyHistory from "@/components/survey-history";
 import NLPInsights from "@/components/nlp-insights";
 import NotesSection from "@/components/notes-section";
-import { ArrowLeft, Mail, MoreVertical, User, Phone, MapPin } from "lucide-react";
+import { ArrowLeft, Mail, MoreVertical, User, Phone, MapPin, Tag, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
@@ -193,17 +193,15 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-medium text-gray-900">Tags</h3>
-                  <div className="h-5 w-5 border border-gray-400 rounded" />
+                  <Tag className="h-5 w-5 text-gray-400" />
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {contact.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded border border-gray-300"
-                    >
-                      {tag.label}
-                    </span>
-                  ))}
+                  <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded border border-blue-300">
+                    High Value
+                  </span>
+                  <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded border border-green-300">
+                    {directoryFields.segment}
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -213,30 +211,36 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-medium text-gray-900">Latest Scores</h3>
-                  <div className="h-5 w-5 border border-gray-400 rounded-full" />
+                  <TrendingUp className="h-5 w-5 text-gray-400" />
                 </div>
                 <div className="space-y-2">
-                  {contact.surveys.find(s => s.status === 'Completed')?.metricScores ? (
-                    <>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">NPS</span>
-                        <span className="text-lg font-semibold text-gray-900">
-                          {(contact.surveys.find(s => s.status === 'Completed')?.metricScores as any)?.nps || 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">CSAT</span>
-                        <span className="text-lg font-semibold text-gray-900">
-                          {(contact.surveys.find(s => s.status === 'Completed')?.metricScores as any)?.csat || 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">CES</span>
-                        <span className="text-lg font-semibold text-gray-900">
-                          {(contact.surveys.find(s => s.status === 'Completed')?.metricScores as any)?.ces || 'N/A'}
-                        </span>
-                      </div>
-                    </>
+                  {contact.surveys.length > 0 && contact.surveys.find(s => s.status === 'completed') ? (
+                    (() => {
+                      const completedSurvey = contact.surveys.find(s => s.status === 'completed');
+                      const metrics = (completedSurvey as any)?.metricsAndCustomMetrics;
+                      return (
+                        <>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">NPS</span>
+                            <span className="text-lg font-semibold text-gray-900">
+                              {metrics?.nps_score || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">CSAT</span>
+                            <span className="text-lg font-semibold text-gray-900">
+                              {metrics?.csat_score || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Ease of Purchase</span>
+                            <span className="text-lg font-semibold text-gray-900">
+                              {metrics?.ease_of_purchase || 'N/A'}
+                            </span>
+                          </div>
+                        </>
+                      );
+                    })()
                   ) : (
                     <p className="text-sm text-gray-500">No completed surveys</p>
                   )}
@@ -248,25 +252,23 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
           {/* Tabbed Content */}
           <Card className="border-gray-200">
             <Tabs defaultValue="overview" className="w-full">
-              <div className="border-b border-gray-200">
-                <div className="flex space-x-8 px-6">
-                  <button className="py-4 px-1 border-b-2 border-gray-900 text-sm font-medium text-gray-900">
-                    Overview
-                  </button>
-                  <button className="py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
-                    Activity Timeline
-                  </button>
-                  <button className="py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
-                    Survey History
-                  </button>
-                  <button className="py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
-                    NLP Insights
-                  </button>
-                  <button className="py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
-                    Notes
-                  </button>
-                </div>
-              </div>
+              <TabsList className="grid w-full grid-cols-5 bg-gray-50">
+                <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-gray-900">
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="activity" className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-gray-900">
+                  Activity Timeline
+                </TabsTrigger>
+                <TabsTrigger value="surveys" className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-gray-900">
+                  Survey History
+                </TabsTrigger>
+                <TabsTrigger value="insights" className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-gray-900">
+                  NLP Insights
+                </TabsTrigger>
+                <TabsTrigger value="notes" className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-gray-900">
+                  Notes
+                </TabsTrigger>
+              </TabsList>
 
               <div className="p-6">
                 <TabsContent value="overview" className="mt-0">
@@ -329,7 +331,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="timeline" className="mt-0">
+                <TabsContent value="activity" className="mt-0">
                   <ActivityTimeline contact={contact} />
                 </TabsContent>
 
