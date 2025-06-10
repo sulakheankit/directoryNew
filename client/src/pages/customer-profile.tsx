@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
 import { ContactWithData } from "@shared/schema";
 import ProfileSummaryCards from "@/components/profile-summary-cards";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,6 +8,8 @@ import ActivityTimeline from "@/components/activity-timeline";
 import SurveyHistory from "@/components/survey-history";
 import NLPInsights from "@/components/nlp-insights";
 import NotesSection from "@/components/notes-section";
+import TimeFilter, { TimeFilterValue } from "@/components/time-filter";
+import { filterByDateRange } from "@/lib/time-filter-utils";
 import { ArrowLeft, Mail, MoreVertical, User, Phone, MapPin, Tag, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,6 +23,41 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
   const { data: contact, isLoading, error } = useQuery<ContactWithData>({
     queryKey: [`/api/contacts/${contactId}`],
   });
+
+  // Time filter state
+  const [timeFilter, setTimeFilter] = useState<TimeFilterValue>({
+    type: 'fixed',
+    range: 'all',
+  });
+
+  // Filter contact data based on time filter
+  const filteredContact = useMemo(() => {
+    if (!contact) return null;
+
+    // Convert date strings to Date objects for filtering
+    const activitiesWithDates = contact.activities.map(activity => ({
+      ...activity,
+      createdAt: new Date(activity.createdAt),
+    }));
+
+    const surveysWithDates = contact.surveys.map(survey => ({
+      ...survey,
+      participationDate: survey.participationDate ? new Date(survey.participationDate) : undefined,
+      sentAt: survey.sentAt ? new Date(survey.sentAt) : undefined,
+    }));
+
+    const notesWithDates = contact.notes.map(note => ({
+      ...note,
+      createdAt: new Date(note.createdAt),
+    }));
+
+    return {
+      ...contact,
+      activities: filterByDateRange(activitiesWithDates, timeFilter),
+      surveys: filterByDateRange(surveysWithDates, timeFilter),
+      notes: filterByDateRange(notesWithDates, timeFilter),
+    };
+  }, [contact, timeFilter]);
 
   if (isLoading) {
     return (
@@ -141,6 +179,11 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
       {/* Profile Content */}
       <main className="p-6">
         <div className="max-w-7xl mx-auto">
+          {/* Time Filter */}
+          <div className="mb-6">
+            <TimeFilter value={timeFilter} onChange={setTimeFilter} />
+          </div>
+
           {/* Profile Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Contact Info Card */}
