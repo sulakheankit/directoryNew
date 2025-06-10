@@ -96,7 +96,7 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
       id: activity.id,
       type: 'activity',
       title: activity.activity,
-      subtitle: `Activity ID: ${(activity.activityFields as any)?.ticket_id || (activity.activityFields as any)?.order_id || activity.id}`,
+      subtitle: `${contact.directory}`,
       date: (activity as any).activityUploadDate ? new Date((activity as any).activityUploadDate) : new Date(activity.createdAt),
       status: primarySurvey?.status,
       icon: getActivityIcon(activity.activity),

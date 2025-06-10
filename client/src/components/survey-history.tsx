@@ -138,7 +138,6 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                   <TableCell className="px-6 py-4">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{survey.surveyTitle}</div>
-                      <div className="text-sm text-gray-500">{survey.id}</div>
                     </div>
                   </TableCell>
                   <TableCell className="px-6 py-4">
@@ -174,13 +173,8 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                   </TableCell>
                   <TableCell className="px-6 py-4 text-sm">
                     {survey.activityId ? (
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {contact.activities.find(activity => activity.id === survey.activityId)?.activity || 'Unknown Activity'}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {survey.activityId}
-                        </div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {contact.activities.find(activity => activity.id === survey.activityId)?.activity || 'Unknown Activity'}
                       </div>
                     ) : (
                       <span className="text-xs text-gray-500">No related activity</span>
