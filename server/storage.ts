@@ -141,6 +141,83 @@ export class MemStorage implements IStorage {
       openEndedEmotions: null
     };
 
+    // Additional sample contacts for the directory
+    const contact2: Contact = {
+      id: "contact_002",
+      directory: "Enterprise Customers",
+      directoryFields: {
+        name: "Timothy Sullivan",
+        email: "timothy.sullivan@gmail.com",
+        phone: "+1-976-432468",
+        company: "TechCorp Inc",
+        role: "Manager",
+        industry: "Technology",
+        annual_revenue: 150000,
+        location: "Lindleyburg, Colorado",
+        join_date: "2022-06-15",
+        segment: "Enterprise"
+      },
+      createdAt: new Date("2022-06-15"),
+      updatedAt: new Date()
+    };
+
+    const contact3: Contact = {
+      id: "contact_003",
+      directory: "Enterprise Customers", 
+      directoryFields: {
+        name: "Holly Caldwell",
+        email: "holly.caldwell@johnson-taylor.org",
+        phone: "+1-976-432469",
+        company: "Johnson Taylor Org",
+        role: "Director",
+        industry: "Consulting",
+        annual_revenue: 120000,
+        location: "West Darrylland, Nevada",
+        join_date: "2021-03-20",
+        segment: "Premium"
+      },
+      createdAt: new Date("2021-03-20"),
+      updatedAt: new Date()
+    };
+
+    const contact4: Contact = {
+      id: "contact_004",
+      directory: "Enterprise Customers",
+      directoryFields: {
+        name: "Kayla Coleman",
+        email: "kayla.coleman@email.com",
+        phone: "+1-976-432465",
+        company: "Coleman Enterprises",
+        role: "VP Sales",
+        industry: "Sales",
+        annual_revenue: 180000,
+        location: "East Curtis, Nebraska",
+        join_date: "2023-04-10",
+        segment: "Enterprise"
+      },
+      createdAt: new Date("2023-04-10"),
+      updatedAt: new Date()
+    };
+
+    const contact5: Contact = {
+      id: "contact_005",
+      directory: "Enterprise Customers",
+      directoryFields: {
+        name: "Jeff Curtis",
+        email: "jeff.curtis@cooke.com",
+        phone: "+1-976-432385",
+        company: "Cooke Industries",
+        role: "Senior Manager",
+        industry: "Manufacturing",
+        annual_revenue: 220000,
+        location: "West Jason, Alabama",
+        join_date: "2020-12-05",
+        segment: "Enterprise"
+      },
+      createdAt: new Date("2020-12-05"),
+      updatedAt: new Date()
+    };
+
     // Sample notes
     const note1: Note = {
       id: "note_001",
@@ -171,6 +248,10 @@ export class MemStorage implements IStorage {
 
     // Store data
     this.contacts.set(contact.id, contact);
+    this.contacts.set(contact2.id, contact2);
+    this.contacts.set(contact3.id, contact3);
+    this.contacts.set(contact4.id, contact4);
+    this.contacts.set(contact5.id, contact5);
     this.activities.set(activity1.id, activity1);
     this.activities.set(activity2.id, activity2);
     this.activities.set(activity3.id, activity3);
@@ -270,6 +351,7 @@ export class MemStorage implements IStorage {
   async createActivity(activity: InsertActivity): Promise<Activity> {
     const newActivity: Activity = {
       ...activity,
+      activityFields: activity.activityFields || {},
       createdAt: new Date()
     };
     this.activities.set(newActivity.id, newActivity);
@@ -283,8 +365,22 @@ export class MemStorage implements IStorage {
   }
 
   async createSurvey(survey: InsertSurvey): Promise<Survey> {
-    this.surveys.set(survey.id, survey);
-    return survey;
+    const newSurvey: Survey = {
+      ...survey,
+      activityId: survey.activityId || null,
+      feedbackRecipient: survey.feedbackRecipient || {},
+      language: survey.language || "English",
+      participationMethod: survey.participationMethod || null,
+      participationDate: survey.participationDate || null,
+      surveyResponseLink: survey.surveyResponseLink || null,
+      metricScores: survey.metricScores || null,
+      driverScores: survey.driverScores || null,
+      openEndedSentiment: survey.openEndedSentiment || null,
+      openEndedThemes: survey.openEndedThemes || null,
+      openEndedEmotions: survey.openEndedEmotions || null
+    };
+    this.surveys.set(newSurvey.id, newSurvey);
+    return newSurvey;
   }
 
   async getNotesByContactId(contactId: string): Promise<Note[]> {
