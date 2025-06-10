@@ -52,6 +52,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clear all contacts, activities, and surveys
+  app.delete('/api/contacts', async (req, res) => {
+    try {
+      await storage.deleteAllContacts();
+      res.json({ message: 'All data cleared successfully' });
+    } catch (error) {
+      console.error('Error clearing data:', error);
+      res.status(500).json({ message: 'Error clearing data' });
+    }
+  });
+
   // Import contacts from CSV or JSON file
   app.post("/api/contacts/import", upload.single('file'), async (req, res) => {
     try {
