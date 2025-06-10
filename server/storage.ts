@@ -44,7 +44,7 @@ export class MemStorage implements IStorage {
   private calculateCommunicationMetrics(surveys: Survey[]) {
     // Email Read Rate calculation
     const emailSurveys = surveys.filter(s => s.channel.toLowerCase() === 'email');
-    const readStatuses = ['email read', 'not participated', 'complete', 'incomplete'];
+    const readStatuses = ['email read', 'not participated', 'completed', 'incomplete', 'dropped out on page', 'completed (edited)', 'incomplete (edited)'];
     const emailReadCount = emailSurveys.filter(s => 
       readStatuses.some(status => s.status.toLowerCase() === status.toLowerCase())
     ).length;
@@ -55,7 +55,7 @@ export class MemStorage implements IStorage {
       ['email', 'sms', 'email and sms'].includes(s.channel.toLowerCase())
     );
     const completedSurveys = responseSurveys.filter(s => 
-      s.status.toLowerCase() === 'complete'
+      s.status.toLowerCase() === 'completed' || s.status.toLowerCase() === 'completed (edited)'
     );
     const responseRate = responseSurveys.length > 0 ? completedSurveys.length / responseSurveys.length : 0;
 
