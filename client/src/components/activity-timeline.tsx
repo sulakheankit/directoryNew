@@ -178,12 +178,12 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     {item.details.surveys && item.details.surveys.length > 0 ? (
                       <Tabs defaultValue="activity" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2">
+                        <TabsList className="grid w-full grid-cols-2" onClick={(e) => e.stopPropagation()}>
                           <TabsTrigger value="activity">Activity Attributes</TabsTrigger>
                           <TabsTrigger value="survey">Survey Details</TabsTrigger>
                         </TabsList>
                         
-                        <TabsContent value="activity" className="mt-4">
+                        <TabsContent value="activity" className="mt-4" onClick={(e) => e.stopPropagation()}>
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             {item.details.uploadDate && (
                               <div>
@@ -208,7 +208,7 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
                           </div>
                         </TabsContent>
                         
-                        <TabsContent value="survey" className="mt-4">
+                        <TabsContent value="survey" className="mt-4" onClick={(e) => e.stopPropagation()}>
                           <div className="space-y-3">
                             {item.details.surveys.map((survey: any, index: number) => (
                               <div key={survey.id} className="border border-gray-200 rounded-lg p-3">
