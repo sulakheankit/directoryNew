@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { ContactWithData, Survey } from "@shared/schema";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -128,119 +128,117 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredSurveys.map((survey) => (
-                <>
-                  <TableRow 
-                    key={survey.id}
-                    className="hover:bg-gray-50 cursor-pointer"
-                    onClick={() => toggleExpandedRow(survey.id)}
-                  >
-                    <TableCell className="px-6 py-4">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{survey.surveyTitle}</div>
-                        <div className="text-sm text-gray-500">{survey.id}</div>
+              {filteredSurveys.map((survey) => [
+                <TableRow 
+                  key={survey.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => toggleExpandedRow(survey.id)}
+                >
+                  <TableCell className="px-6 py-4">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{survey.surveyTitle}</div>
+                      <div className="text-sm text-gray-500">{survey.id}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <div className="flex items-center">
+                      {getChannelIcon(survey.channel)}
+                      <span className="text-sm text-gray-900 ml-2">{survey.channel}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-sm text-gray-900">
+                    {new Date(survey.sentAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit'
+                    })}
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    {getStatusBadge(survey.status)}
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    {survey.metricScores ? (
+                      <div className="flex space-x-2">
+                        {(survey.metricScores as any).nps && (
+                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                            NPS: {(survey.metricScores as any).nps}
+                          </Badge>
+                        )}
+                        {(survey.metricScores as any).csat && (
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                            CSAT: {(survey.metricScores as any).csat}
+                          </Badge>
+                        )}
                       </div>
-                    </TableCell>
-                    <TableCell className="px-6 py-4">
-                      <div className="flex items-center">
-                        {getChannelIcon(survey.channel)}
-                        <span className="text-sm text-gray-900 ml-2">{survey.channel}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-6 py-4 text-sm text-gray-900">
-                      {new Date(survey.sentAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit'
-                      })}
-                    </TableCell>
-                    <TableCell className="px-6 py-4">
-                      {getStatusBadge(survey.status)}
-                    </TableCell>
-                    <TableCell className="px-6 py-4">
-                      {survey.metricScores ? (
-                        <div className="flex space-x-2">
-                          {(survey.metricScores as any).nps && (
-                            <Badge variant="secondary" className="bg-green-100 text-green-800">
-                              NPS: {(survey.metricScores as any).nps}
-                            </Badge>
-                          )}
-                          {(survey.metricScores as any).csat && (
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                              CSAT: {(survey.metricScores as any).csat}
-                            </Badge>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-500">Not Completed</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="px-6 py-4 text-sm font-medium">
-                      <Button variant="link" className="text-primary hover:text-blue-900 p-0">
-                        {survey.status === 'Completed' ? 'View Details' : 'Resend'}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                    ) : (
+                      <span className="text-xs text-gray-500">Not Completed</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-sm font-medium">
+                    <Button variant="link" className="text-primary hover:text-blue-900 p-0">
+                      {survey.status === 'Completed' ? 'View Details' : 'Resend'}
+                    </Button>
+                  </TableCell>
+                </TableRow>,
 
-                  {/* Expanded Details Row */}
-                  {expandedRows.has(survey.id) && (
-                    <TableRow className="bg-gray-50">
-                      <TableCell colSpan={6} className="px-6 py-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                // Expanded Details Row
+                expandedRows.has(survey.id) && (
+                  <TableRow key={`${survey.id}-expanded`} className="bg-gray-50">
+                    <TableCell colSpan={6} className="px-6 py-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900 mb-2">Response Details</h4>
+                          <div className="space-y-2 text-sm">
+                            <div>
+                              <span className="font-medium">Participation Method:</span>{' '}
+                              {survey.participationMethod || 'N/A'}
+                            </div>
+                            <div>
+                              <span className="font-medium">Response Time:</span>{' '}
+                              {survey.participationDate ? 
+                                `${Math.round((new Date(survey.participationDate).getTime() - new Date(survey.sentAt).getTime()) / (1000 * 60 * 60))} hours after sent` : 
+                                'N/A'
+                              }
+                            </div>
+                            <div>
+                              <span className="font-medium">Language:</span> {survey.language}
+                            </div>
+                          </div>
+                        </div>
+                        {survey.openEndedSentiment && (
                           <div>
-                            <h4 className="text-sm font-medium text-gray-900 mb-2">Response Details</h4>
+                            <h4 className="text-sm font-medium text-gray-900 mb-2">Feedback Summary</h4>
                             <div className="space-y-2 text-sm">
                               <div>
-                                <span className="font-medium">Participation Method:</span>{' '}
-                                {survey.participationMethod || 'N/A'}
+                                <span className="font-medium">Sentiment:</span>{' '}
+                                <span className={survey.openEndedSentiment === 'positive' ? 'text-green-600' : 'text-gray-600'}>
+                                  {survey.openEndedSentiment.charAt(0).toUpperCase() + survey.openEndedSentiment.slice(1)}
+                                </span>
                               </div>
                               <div>
-                                <span className="font-medium">Response Time:</span>{' '}
-                                {survey.participationDate ? 
-                                  `${Math.round((new Date(survey.participationDate).getTime() - new Date(survey.sentAt).getTime()) / (1000 * 60 * 60))} hours after sent` : 
+                                <span className="font-medium">Key Themes:</span>{' '}
+                                {Array.isArray(survey.openEndedThemes) ? 
+                                  survey.openEndedThemes.join(', ') : 
                                   'N/A'
                                 }
                               </div>
                               <div>
-                                <span className="font-medium">Language:</span> {survey.language}
+                                <span className="font-medium">Emotions:</span>{' '}
+                                {Array.isArray(survey.openEndedEmotions) ? 
+                                  survey.openEndedEmotions.join(', ') : 
+                                  'N/A'
+                                }
                               </div>
                             </div>
                           </div>
-                          {survey.openEndedSentiment && (
-                            <div>
-                              <h4 className="text-sm font-medium text-gray-900 mb-2">Feedback Summary</h4>
-                              <div className="space-y-2 text-sm">
-                                <div>
-                                  <span className="font-medium">Sentiment:</span>{' '}
-                                  <span className={survey.openEndedSentiment === 'positive' ? 'text-green-600' : 'text-gray-600'}>
-                                    {survey.openEndedSentiment.charAt(0).toUpperCase() + survey.openEndedSentiment.slice(1)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="font-medium">Key Themes:</span>{' '}
-                                  {Array.isArray(survey.openEndedThemes) ? 
-                                    survey.openEndedThemes.join(', ') : 
-                                    'N/A'
-                                  }
-                                </div>
-                                <div>
-                                  <span className="font-medium">Emotions:</span>{' '}
-                                  {Array.isArray(survey.openEndedEmotions) ? 
-                                    survey.openEndedEmotions.join(', ') : 
-                                    'N/A'
-                                  }
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </>
-              ))}
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              ].filter(Boolean))}
             </TableBody>
           </Table>
         </div>

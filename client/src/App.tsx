@@ -5,11 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import CustomerProfile from "@/pages/customer-profile";
+import CustomerDirectory from "@/pages/customer-directory";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={() => <CustomerProfile contactId="contact_001" />} />
+      <Route path="/" component={CustomerDirectory} />
       <Route path="/contact/:id" component={({ params }) => <CustomerProfile contactId={params.id} />} />
       <Route component={NotFound} />
     </Switch>

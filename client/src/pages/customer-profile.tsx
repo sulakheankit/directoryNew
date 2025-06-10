@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { ContactWithData } from "@shared/schema";
-import DashboardLayout from "@/components/dashboard-layout";
 import ProfileSummaryCards from "@/components/profile-summary-cards";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,9 +7,10 @@ import ActivityTimeline from "@/components/activity-timeline";
 import SurveyHistory from "@/components/survey-history";
 import NLPInsights from "@/components/nlp-insights";
 import NotesSection from "@/components/notes-section";
-import { ArrowLeft, Mail, MoreVertical } from "lucide-react";
+import { ArrowLeft, Mail, MoreVertical, User, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "wouter";
 
 interface CustomerProfileProps {
   contactId: string;
