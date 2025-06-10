@@ -344,33 +344,40 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">CSAT Score</span>
-                      <span className="text-lg font-bold text-gray-900">
-                        {filteredContact?.surveys.length > 0 
-                          ? ((filteredContact.surveys[0] as any).metricScores?.csat_score || 'N/A')
-                          : 'N/A'
-                        }
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Effort Score</span>
-                      <span className="text-lg font-bold text-gray-900">
-                        {filteredContact?.surveys.length > 0 
-                          ? ((filteredContact.surveys[0] as any).metricScores?.effort_score || 'N/A')
-                          : 'N/A'
-                        }
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Resolution Rating</span>
-                      <span className="text-lg font-bold text-gray-900">
-                        {filteredContact?.surveys.length > 0 
-                          ? ((filteredContact.surveys[0] as any).metricScores?.escalation_handling || 'N/A')
-                          : 'N/A'
-                        }
-                      </span>
-                    </div>
+                    {(() => {
+                      // Find the most recent completed survey with metrics
+                      const completedSurvey = filteredContact?.surveys
+                        .filter(s => s.status === 'completed' || s.status === 'Completed')
+                        .find(s => s.metricScores);
+                      
+                      if (!completedSurvey) {
+                        return <p className="text-sm text-gray-500">No completed surveys with scores</p>;
+                      }
+                      
+                      const metrics = completedSurvey.metricScores as any;
+                      
+                      // Get the first 3 metrics dynamically from whatever is available
+                      const metricEntries = Object.entries(metrics || {}).slice(0, 3);
+                      
+                      if (metricEntries.length === 0) {
+                        return <p className="text-sm text-gray-500">No metric scores available</p>;
+                      }
+                      
+                      return (
+                        <>
+                          {metricEntries.map(([key, value]) => (
+                            <div key={key} className="flex justify-between items-center">
+                              <span className="text-sm text-gray-600">
+                                {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              </span>
+                              <span className="text-lg font-bold text-gray-900">
+                                {value as string}
+                              </span>
+                            </div>
+                          ))}
+                        </>
+                      );
+                    })()}
                   </CardContent>
                 </Card>
               </div>
