@@ -155,6 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const contactMap = new Map();
           const activitiesMap = new Map();
           const surveysMap = new Map();
+          const rowDataMap = new Map(); // Store row data to link activities and surveys
           
           stream
             .pipe(csv())
@@ -199,6 +200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
                 
                 // Parse activity data
+                let currentActivityId = null;
                 if (data['Activity'] && data['Activity Fields (JSONb)']) {
                   try {
                     let activityJsonStr = data['Activity Fields (JSONb)'];
@@ -208,23 +210,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     activityJsonStr = activityJsonStr.replace(/""/g, '"');
                     const activityFields = JSON.parse(activityJsonStr);
                     
-                    const activityId = `activity_${contactId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                    currentActivityId = `activity_${contactId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                     
                     const activityData = {
-                      id: activityId,
+                      id: currentActivityId,
                       contactId: contactId,
                       activity: data['Activity'],
                       activityFields: activityFields,
                       activityUploadDate: data['Activity Upload Date'] ? new Date(data['Activity Upload Date']) : null
                     };
-                    activitiesMap.set(activityId, activityData);
-                    console.log("Extracted CSV activity:", activityId, data['Activity']);
+                    activitiesMap.set(currentActivityId, activityData);
+                    console.log("Extracted CSV activity:", currentActivityId, data['Activity']);
                   } catch (e) {
                     console.log("Error parsing activity fields JSON:", e);
                   }
                 }
                 
-                // Parse survey data
+                // Parse survey data and link to current activity
                 if (data['Survey ID'] && data['Survey Title']) {
                   try {
                     // Helper function to parse JSON fields
@@ -239,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     const surveyData = {
                       id: data['Survey ID'],
                       contactId: contactId,
-                      activityId: null,
+                      activityId: currentActivityId, // Link to the current activity
                       surveyTitle: data['Survey Title'],
                       feedbackRecipient: data['Feedback Recipient (JSONb)'] ? parseJsonField(data['Feedback Recipient (JSONb)']) : null,
                       channel: data['Channel'] || 'email',

@@ -86,6 +86,11 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
       survey.activityId === activity.id
     );
     
+    // Debug logging
+    console.log('Activity:', activity.id, 'Activity fields:', activity.activityFields);
+    console.log('All surveys for contact:', contact.surveys.map(s => ({ id: s.id, activityId: s.activityId, surveyTitle: s.surveyTitle })));
+    console.log('Linked surveys for activity', activity.id, ':', linkedSurveys);
+    
     // Get the primary survey for status and sentiment
     const primarySurvey = linkedSurveys[0];
     
