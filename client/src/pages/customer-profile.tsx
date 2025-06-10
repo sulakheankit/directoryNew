@@ -266,95 +266,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                 </CardContent>
               </Card>
 
-              {/* Communication Card */}
-              <Card className="mt-6">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-medium flex items-center">
-                    <Mail className="h-5 w-5 mr-2" />
-                    Communication
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Email Read Rate</p>
-                      <p className="text-sm font-semibold text-gray-900">{(contact.communicationMetrics.emailReadRate * 100).toFixed(1)}%</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Response Rate</p>
-                      <p className="text-sm font-semibold text-gray-900">{(contact.communicationMetrics.responseRate * 100).toFixed(1)}%</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Last Contact</p>
-                      <p className="text-sm text-gray-900">{contact.communicationMetrics.lastContact}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
 
-              {/* Tags Card */}
-              <Card className="mt-6">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-medium flex items-center">
-                    <Tag className="h-5 w-5 mr-2" />
-                    Tags
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {contact.tags.map((tag, index) => (
-                      <Badge 
-                        key={index} 
-                        variant={tag.type === 'ai' ? 'default' : 'secondary'}
-                        className="text-xs"
-                      >
-                        {tag.label}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Latest Scores Card */}
-              <Card className="mt-6">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-medium flex items-center">
-                    <TrendingUp className="h-5 w-5 mr-2" />
-                    Latest Scores
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">CSAT Score</p>
-                      <p className="text-lg font-bold text-gray-900">
-                        {filteredContact?.surveys.length > 0 
-                          ? ((filteredContact.surveys[0] as any).metricScores?.csat_score || 'N/A')
-                          : 'N/A'
-                        }
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Effort Score</p>
-                      <p className="text-lg font-bold text-gray-900">
-                        {filteredContact?.surveys.length > 0 
-                          ? ((filteredContact.surveys[0] as any).metricScores?.effort_score || 'N/A')
-                          : 'N/A'
-                        }
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Resolution Rating</p>
-                      <p className="text-lg font-bold text-gray-900">
-                        {filteredContact?.surveys.length > 0 
-                          ? ((filteredContact.surveys[0] as any).metricScores?.escalation_handling || 'N/A')
-                          : 'N/A'
-                        }
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
 
             {/* Right Panel - Main Content */}
@@ -366,6 +278,101 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                   value={timeFilter} 
                   onChange={setTimeFilter}
                 />
+              </div>
+
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                {/* Communication Card */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg font-medium flex items-center">
+                      <Mail className="h-5 w-5 mr-2" />
+                      Communication
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Email Read Rate</span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {(contact.communicationMetrics.emailReadRate * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Response Rate</span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {(contact.communicationMetrics.responseRate * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Last Contact</span>
+                      <span className="text-sm text-gray-600">
+                        {contact.communicationMetrics.lastContact}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Tags Card */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg font-medium flex items-center">
+                      <Tag className="h-5 w-5 mr-2" />
+                      Tags
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {contact.tags.map((tag, index) => (
+                        <Badge 
+                          key={index} 
+                          variant={tag.type === 'ai' ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
+                          {tag.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Latest Scores Card */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg font-medium flex items-center">
+                      <TrendingUp className="h-5 w-5 mr-2" />
+                      Latest Scores
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">CSAT Score</span>
+                      <span className="text-lg font-bold text-gray-900">
+                        {filteredContact?.surveys.length > 0 
+                          ? ((filteredContact.surveys[0] as any).metricScores?.csat_score || 'N/A')
+                          : 'N/A'
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Effort Score</span>
+                      <span className="text-lg font-bold text-gray-900">
+                        {filteredContact?.surveys.length > 0 
+                          ? ((filteredContact.surveys[0] as any).metricScores?.effort_score || 'N/A')
+                          : 'N/A'
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Resolution Rating</span>
+                      <span className="text-lg font-bold text-gray-900">
+                        {filteredContact?.surveys.length > 0 
+                          ? ((filteredContact.surveys[0] as any).metricScores?.escalation_handling || 'N/A')
+                          : 'N/A'
+                        }
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               <Tabs defaultValue="activity" className="w-full">
