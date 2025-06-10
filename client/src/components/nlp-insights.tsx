@@ -19,13 +19,18 @@ export default function NLPInsights({ contact }: NLPInsightsProps) {
   })).filter(s => s.sentiment || s.themes || s.emotions);
 
   // Aggregate sentiment analysis
-  const sentimentCounts = { positive: 0, negative: 0, neutral: 0 };
+  const sentimentCounts = { positive: 0, negative: 0, neutral: 0, mixed: 0 };
   const allThemes: string[] = [];
   const allEmotions: string[] = [];
 
   surveyInsights.forEach(survey => {
     if (survey.sentiment) {
-      sentimentCounts[survey.sentiment as keyof typeof sentimentCounts]++;
+      const sentiment = survey.sentiment.toLowerCase();
+      if (sentiment === 'mixed') {
+        sentimentCounts.mixed++;
+      } else if (sentimentCounts.hasOwnProperty(sentiment)) {
+        sentimentCounts[sentiment as keyof typeof sentimentCounts]++;
+      }
     }
     
     if (survey.themes) {
@@ -48,20 +53,23 @@ export default function NLPInsights({ contact }: NLPInsightsProps) {
   });
 
   // Calculate overall sentiment
-  const totalSentiments = sentimentCounts.positive + sentimentCounts.negative + sentimentCounts.neutral;
+  const totalSentiments = sentimentCounts.positive + sentimentCounts.negative + sentimentCounts.neutral + sentimentCounts.mixed;
   const overallSentiment = totalSentiments > 0 
-    ? sentimentCounts.positive > sentimentCounts.negative && sentimentCounts.positive > sentimentCounts.neutral 
+    ? sentimentCounts.positive > sentimentCounts.negative && sentimentCounts.positive > sentimentCounts.neutral && sentimentCounts.positive > sentimentCounts.mixed
       ? 'positive' 
-      : sentimentCounts.negative > sentimentCounts.positive && sentimentCounts.negative > sentimentCounts.neutral 
+      : sentimentCounts.negative > sentimentCounts.positive && sentimentCounts.negative > sentimentCounts.neutral && sentimentCounts.negative > sentimentCounts.mixed
         ? 'negative' 
-        : 'neutral'
+        : sentimentCounts.mixed > 0 && sentimentCounts.mixed >= sentimentCounts.positive && sentimentCounts.mixed >= sentimentCounts.negative && sentimentCounts.mixed >= sentimentCounts.neutral
+          ? 'mixed'
+          : 'neutral'
     : 'neutral';
 
   // Pie chart data
   const pieData = [
     { name: 'Positive', value: sentimentCounts.positive, color: '#10B981' },
     { name: 'Negative', value: sentimentCounts.negative, color: '#EF4444' },
-    { name: 'Neutral', value: sentimentCounts.neutral, color: '#F59E0B' }
+    { name: 'Neutral', value: sentimentCounts.neutral, color: '#F59E0B' },
+    { name: 'Mixed', value: sentimentCounts.mixed, color: '#8B5CF6' }
   ].filter(item => item.value > 0);
 
   // Word frequency for themes and emotions
@@ -85,6 +93,8 @@ export default function NLPInsights({ contact }: NLPInsightsProps) {
         return 'text-green-600';
       case 'negative':
         return 'text-red-600';
+      case 'mixed':
+        return 'text-purple-600';
       default:
         return 'text-yellow-600';
     }
@@ -96,6 +106,8 @@ export default function NLPInsights({ contact }: NLPInsightsProps) {
         return 'bg-green-50';
       case 'negative':
         return 'bg-red-50';
+      case 'mixed':
+        return 'bg-purple-50';
       default:
         return 'bg-yellow-50';
     }

@@ -126,9 +126,11 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Activities</SelectItem>
-              <SelectItem value="survey">Surveys</SelectItem>
-              <SelectItem value="support">Support</SelectItem>
-              <SelectItem value="sales">Sales</SelectItem>
+              {Array.from(new Set(contact.activities.map(activity => activity.activity))).map(activityName => (
+                <SelectItem key={activityName} value={activityName.toLowerCase()}>
+                  {activityName}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
