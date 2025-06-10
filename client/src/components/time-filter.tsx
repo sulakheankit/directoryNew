@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -84,95 +83,87 @@ export default function TimeFilter({ value, onChange }: TimeFilterProps) {
   };
 
   return (
-    <Card className="border-gray-200">
-      <CardContent className="p-4">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-gray-700">Time Filter:</span>
-          </div>
+    <div className="flex flex-wrap items-center gap-4">
+      <Select value={filterType} onValueChange={handleTypeChange}>
+        <SelectTrigger className="w-40">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="fixed">Fixed Ranges</SelectItem>
+          <SelectItem value="rolling">Rolling Periods</SelectItem>
+          <SelectItem value="custom">Custom Range</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {filterType === 'fixed' && (
+        <Select value={value.range} onValueChange={handleRangeChange}>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {FIXED_RANGES.map((range) => (
+              <SelectItem key={range.value} value={range.value}>
+                {range.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      {filterType === 'rolling' && (
+        <Select value={value.range} onValueChange={handleRangeChange}>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {ROLLING_PERIODS.map((period) => (
+              <SelectItem key={period.value} value={period.value}>
+                {period.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      {filterType === 'custom' && (
+        <div className="flex items-center space-x-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-40 justify-start text-left font-normal">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {value.startDate ? format(value.startDate, "PPP") : "Start date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={value.startDate}
+                onSelect={(date) => handleCustomDateChange('startDate', date)}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
           
-          <Select value={filterType} onValueChange={handleTypeChange}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="fixed">Fixed Ranges</SelectItem>
-              <SelectItem value="rolling">Rolling Periods</SelectItem>
-              <SelectItem value="custom">Custom Range</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {filterType === 'fixed' && (
-            <Select value={value.range} onValueChange={handleRangeChange}>
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {FIXED_RANGES.map((range) => (
-                  <SelectItem key={range.value} value={range.value}>
-                    {range.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
-          {filterType === 'rolling' && (
-            <Select value={value.range} onValueChange={handleRangeChange}>
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {ROLLING_PERIODS.map((period) => (
-                  <SelectItem key={period.value} value={period.value}>
-                    {period.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
-          {filterType === 'custom' && (
-            <div className="flex items-center space-x-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-40 justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {value.startDate ? format(value.startDate, "PPP") : "Start date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={value.startDate}
-                    onSelect={(date) => handleCustomDateChange('startDate', date)}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              
-              <span className="text-gray-500">to</span>
-              
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-40 justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {value.endDate ? format(value.endDate, "PPP") : "End date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={value.endDate}
-                    onSelect={(date) => handleCustomDateChange('endDate', date)}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          )}
+          <span className="text-gray-500">to</span>
+          
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-40 justify-start text-left font-normal">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {value.endDate ? format(value.endDate, "PPP") : "End date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={value.endDate}
+                onSelect={(date) => handleCustomDateChange('endDate', date)}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
