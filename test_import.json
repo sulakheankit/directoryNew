@@ -1,0 +1,19 @@
+[
+  {
+    "id": "rec_001",
+    "contact_id": "contact_001",
+    "directory": "Enterprise Customers",
+    "directory_fields": {
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@techcorp.com",
+      "phone": "+1-555-0101",
+      "company": "TechCorp Inc",
+      "role": "VP Marketing",
+      "industry": "Technology",
+      "annual_revenue": 250000,
+      "location": "San Francisco, CA",
+      "join_date": "2023-01-15",
+      "segment": "Enterprise"
+    }
+  }
+]

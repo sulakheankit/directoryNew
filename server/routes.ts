@@ -166,8 +166,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle JSON import
       if (fileName.endsWith('.json')) {
         const createdContacts = [];
+        console.log(`Processing ${contacts.length} contacts for import`);
+        
         for (const contactData of contacts) {
           try {
+            console.log("Processing contact:", contactData.id, contactData.directory);
+            console.log("Directory fields:", contactData.directoryFields);
+            
             // Ensure required fields are present
             if (!contactData.id) {
               contactData.id = `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -177,13 +182,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             
             const validatedContact = insertContactSchema.parse(contactData);
+            console.log("Validated contact:", validatedContact);
+            
             const createdContact = await storage.createContact(validatedContact);
+            console.log("Created contact:", createdContact);
             createdContacts.push(createdContact);
           } catch (validationError) {
-            console.warn("Skipping invalid contact:", validationError);
+            console.error("Validation error for contact:", contactData.id, validationError);
           }
         }
         
+        console.log(`Successfully created ${createdContacts.length} contacts`);
         res.json({ 
           message: `Successfully imported ${createdContacts.length} contacts`,
           imported: createdContacts.length,

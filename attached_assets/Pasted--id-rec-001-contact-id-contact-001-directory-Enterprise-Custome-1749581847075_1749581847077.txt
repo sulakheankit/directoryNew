@@ -1,0 +1,579 @@
+[
+  {
+    "id": "rec_001",
+    "contact_id": "contact_001",
+    "directory": "Enterprise Customers",
+    "directory_fields": {
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@techcorp.com",
+      "phone": "+1-555-0101",
+      "company": "TechCorp Inc",
+      "role": "VP Marketing",
+      "industry": "Technology",
+      "annual_revenue": 250000,
+      "location": "San Francisco, CA",
+      "join_date": "2023-01-15",
+      "segment": "Enterprise"
+    },
+    "activity": "Purchase",
+    "activity_fields": {
+      "product": "Enterprise License",
+      "amount": 24999.99,
+      "currency": "USD",
+      "sales_rep": "Mike Chen",
+      "contract_duration": 12,
+      "payment_method": "Wire Transfer"
+    },
+    "feedback_recipient": {
+      "id": "team_sales",
+      "name": "Sales Team",
+      "type": "team",
+      "email": "sales@company.com"
+    },
+    "survey_id": "survey_nps_enterprise",
+    "survey_title": "Enterprise Purchase Experience",
+    "channel": "email",
+    "sent_at": "2024-01-20T10:00:00Z",
+    "language": "en",
+    "status": "completed",
+    "participated_via": "email",
+    "participated_date": "2024-01-20T14:30:00Z",
+    "survey_response_link": "https://surveys.company.com/r/ent001",
+    "metrics_and_custom_metrics": {
+      "nps_score": 9,
+      "csat_score": 5,
+      "ease_of_purchase": 8,
+      "sales_experience": 9,
+      "product_fit": 8
+    },
+    "driver_scores": {
+      "product_quality": 9,
+      "sales_support": 9,
+      "pricing": 7,
+      "implementation": 8
+    },
+    "open_ended_sentiment": "positive",
+    "open_ended_themes": [
+      {"theme": "excellent_support", "confidence": 0.92},
+      {"theme": "product_quality", "confidence": 0.88}
+    ],
+    "open_ended_emotions": [
+      {"emotion": "satisfaction", "intensity": 0.9, "confidence": 0.87}
+    ]
+  },
+  {
+    "id": "rec_002",
+    "contact_id": "contact_001",
+    "directory": "Enterprise Customers",
+    "directory_fields": {
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@techcorp.com",
+      "phone": "+1-555-0101",
+      "company": "TechCorp Inc",
+      "role": "VP Marketing",
+      "industry": "Technology",
+      "annual_revenue": 250000,
+      "location": "San Francisco, CA",
+      "join_date": "2023-01-15",
+      "segment": "Enterprise"
+    },
+    "activity": "Support Ticket",
+    "activity_fields": {
+      "ticket_id": "SUP-2024-001",
+      "category": "Technical",
+      "priority": "High",
+      "resolution_time": 4.5,
+      "agent": "Lisa Wong"
+    },
+    "feedback_recipient": {
+      "id": "team_support",
+      "name": "Customer Support",
+      "type": "team",
+      "email": "support@company.com"
+    }
+  },
+  {
+    "id": "rec_003",
+    "contact_id": "contact_001",
+    "directory": "Enterprise Customers",
+    "directory_fields": {
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@techcorp.com",
+      "phone": "+1-555-0101",
+      "company": "TechCorp Inc",
+      "role": "VP Marketing",
+      "industry": "Technology",
+      "annual_revenue": 250000,
+      "location": "San Francisco, CA",
+      "join_date": "2023-01-15",
+      "segment": "Enterprise"
+    },
+    "activity": "Training Session",
+    "activity_fields": {
+      "session_type": "Advanced Features",
+      "duration": 120,
+      "attendees": 8,
+      "trainer": "Alex Rodriguez",
+      "completion_rate": 100
+    },
+    "feedback_recipient": {
+      "id": "team_training",
+      "name": "Training Team",
+      "type": "team",
+      "email": "training@company.com"
+    },
+    "survey_id": "survey_training_feedback",
+    "survey_title": "Training Session Feedback",
+    "channel": "sms",
+    "sent_at": "2024-02-15T16:00:00Z",
+    "language": "en",
+    "status": "completed",
+    "participated_via": "sms",
+    "participated_date": "2024-02-15T18:45:00Z",
+    "survey_response_link": "https://surveys.company.com/r/tr001",
+    "metrics_and_custom_metrics": {
+      "training_satisfaction": 8,
+      "content_quality": 9,
+      "trainer_effectiveness": 8,
+      "likelihood_to_recommend": 9
+    },
+    "driver_scores": {
+      "content_relevance": 9,
+      "trainer_knowledge": 8,
+      "session_pace": 7,
+      "materials_quality": 8
+    },
+    "open_ended_sentiment": "positive",
+    "open_ended_themes": [
+      {"theme": "comprehensive_content", "confidence": 0.85},
+      {"theme": "knowledgeable_trainer", "confidence": 0.90}
+    ],
+    "open_ended_emotions": [
+      {"emotion": "engagement", "intensity": 0.8, "confidence": 0.82}
+    ]
+  },
+  {
+    "id": "rec_004",
+    "contact_id": "contact_001",
+    "directory": "Enterprise Customers",
+    "directory_fields": {
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@techcorp.com",
+      "phone": "+1-555-0101",
+      "company": "TechCorp Inc",
+      "role": "VP Marketing",
+      "industry": "Technology",
+      "annual_revenue": 250000,
+      "location": "San Francisco, CA",
+      "join_date": "2023-01-15",
+      "segment": "Enterprise"
+    },
+    "activity": "Trial Expiry",
+    "activity_fields": {
+      "trial_type": "30-day Extended",
+      "days_used": 25,
+      "features_explored": 12,
+      "login_frequency": "Daily",
+      "conversion_likelihood": "High"
+    },
+    "feedback_recipient": {
+      "id": "team_growth",
+      "name": "Growth Team",
+      "type": "team",
+      "email": "growth@company.com"
+    },
+    "survey_id": "survey_trial_exit",
+    "survey_title": "Trial Experience Survey",
+    "channel": "email",
+    "sent_at": "2024-05-30T08:00:00Z",
+    "language": "en",
+    "status": "completed",
+    "participated_via": "email",
+    "participated_date": "2024-05-30T10:45:00Z",
+    "survey_response_link": "https://surveys.company.com/r/trial002",
+    "metrics_and_custom_metrics": {
+      "trial_satisfaction": 8,
+      "feature_completeness": 7,
+      "purchase_intent": 8,
+      "price_perception": 6
+    },
+    "driver_scores": {
+      "product_functionality": 8,
+      "user_experience": 7,
+      "value_proposition": 6,
+      "trial_length": 8
+    },
+    "open_ended_sentiment": "positive",
+    "open_ended_themes": [
+      {"theme": "strong_features", "confidence": 0.84},
+      {"theme": "pricing_concerns", "confidence": 0.78}
+    ],
+    "open_ended_emotions": [
+      {"emotion": "interest", "intensity": 0.8, "confidence": 0.81},
+      {"emotion": "hesitation", "intensity": 0.4, "confidence": 0.72}
+    ]
+  },
+  {
+    "id": "rec_005",
+    "contact_id": "contact_002",
+    "directory": "SMB Customers",
+    "directory_fields": {
+      "name": "Mike Thompson",
+      "email": "mike@designstudio.com",
+      "phone": "+1-555-0202",
+      "company": "Creative Design Studio",
+      "role": "Owner",
+      "industry": "Design",
+      "annual_revenue": 85000,
+      "location": "Austin, TX",
+      "join_date": "2023-06-10",
+      "segment": "SMB"
+    },
+    "activity": "Purchase",
+    "activity_fields": {
+      "product": "Pro License",
+      "amount": 199.99,
+      "currency": "USD",
+      "sales_rep": "Jenny Park",
+      "contract_duration": 1,
+      "payment_method": "Credit Card"
+    },
+    "feedback_recipient": {
+      "id": "team_smb_sales",
+      "name": "SMB Sales Team",
+      "type": "team",
+      "email": "smbsales@company.com"
+    },
+    "survey_id": "survey_nps_smb",
+    "survey_title": "SMB Purchase Experience",
+    "channel": "email",
+    "sent_at": "2024-01-25T09:00:00Z",
+    "language": "en",
+    "status": "completed",
+    "participated_via": "email",
+    "participated_date": "2024-01-25T11:20:00Z",
+    "survey_response_link": "https://surveys.company.com/r/smb001",
+    "metrics_and_custom_metrics": {
+      "nps_score": 8,
+      "csat_score": 4,
+      "value_for_money": 9,
+      "ease_of_purchase": 7
+    },
+    "driver_scores": {
+      "product_features": 8,
+      "pricing": 9,
+      "sales_process": 7,
+      "onboarding": 6
+    },
+    "open_ended_sentiment": "positive",
+    "open_ended_themes": [
+      {"theme": "great_value", "confidence": 0.88},
+      {"theme": "feature_rich", "confidence": 0.79}
+    ],
+    "open_ended_emotions": [
+      {"emotion": "satisfaction", "intensity": 0.7, "confidence": 0.81}
+    ]
+  },
+  {
+    "id": "rec_006",
+    "contact_id": "contact_002",
+    "directory": "SMB Customers",
+    "directory_fields": {
+      "name": "Mike Thompson",
+      "email": "mike@designstudio.com",
+      "phone": "+1-555-0202",
+      "company": "Creative Design Studio",
+      "role": "Owner",
+      "industry": "Design",
+      "annual_revenue": 85000,
+      "location": "Austin, TX",
+      "join_date": "2023-06-10",
+      "segment": "SMB"
+    },
+    "activity": "Billing Issue",
+    "activity_fields": {
+      "issue_type": "Payment Failure",
+      "amount": 199.99,
+      "resolution_method": "Updated Card",
+      "downtime_hours": 2,
+      "resolved_by": "Emma Davis"
+    },
+    "feedback_recipient": {
+      "id": "team_billing",
+      "name": "Billing Support",
+      "type": "team",
+      "email": "billing@company.com"
+    },
+    "survey_id": "survey_billing_resolution",
+    "survey_title": "Billing Issue Resolution",
+    "channel": "sms",
+    "sent_at": "2024-03-15T15:00:00Z",
+    "language": "en",
+    "status": "completed",
+    "participated_via": "sms",
+    "participated_date": "2024-03-15T17:20:00Z",
+    "survey_response_link": "https://surveys.company.com/r/bill001",
+    "metrics_and_custom_metrics": {
+      "csat_score": 4,
+      "resolution_speed": 7,
+      "communication_quality": 8,
+      "process_clarity": 6
+    },
+    "driver_scores": {
+      "response_time": 7,
+      "agent_helpfulness": 8,
+      "process_efficiency": 6,
+      "follow_up": 7
+    },
+    "open_ended_sentiment": "positive",
+    "open_ended_themes": [
+      {"theme": "quick_fix", "confidence": 0.82},
+      {"theme": "clear_communication", "confidence": 0.79}
+    ],
+    "open_ended_emotions": [
+      {"emotion": "relief", "intensity": 0.8, "confidence": 0.80}
+    ]
+  },
+  {
+    "id": "rec_007",
+    "contact_id": "contact_003",
+    "directory": "SMB Customers",
+    "directory_fields": {
+      "name": "Elena Rodriguez",
+      "email": "elena@marketingpro.com",
+      "phone": "+1-555-0303",
+      "company": "Marketing Pro Solutions",
+      "role": "Marketing Manager",
+      "industry": "Marketing",
+      "annual_revenue": 120000,
+      "location": "Miami, FL",
+      "join_date": "2024-03-01",
+      "segment": "SMB"
+    },
+    "activity": "Trial Conversion",
+    "activity_fields": {
+      "converted_to": "Business Plan",
+      "amount": 99.99,
+      "currency": "USD",
+      "trial_duration_used": 14,
+      "conversion_trigger": "Feature Satisfaction"
+    },
+    "feedback_recipient": {
+      "id": "team_conversion",
+      "name": "Conversion Team",
+      "type": "team",
+      "email": "conversion@company.com"
+    },
+    "survey_id": "survey_conversion_smb",
+    "survey_title": "Trial Conversion Experience",
+    "channel": "email",
+    "sent_at": "2024-03-16T09:00:00Z",
+    "language": "en",
+    "status": "completed",
+    "participated_via": "email",
+    "participated_date": "2024-03-16T12:15:00Z",
+    "survey_response_link": "https://surveys.company.com/r/conv002",
+    "metrics_and_custom_metrics": {
+      "conversion_satisfaction": 9,
+      "trial_experience": 9,
+      "pricing_satisfaction": 8,
+      "feature_match": 9
+    },
+    "driver_scores": {
+      "trial_completeness": 9,
+      "pricing_clarity": 8,
+      "feature_value": 9,
+      "conversion_process": 8
+    },
+    "open_ended_sentiment": "positive",
+    "open_ended_themes": [
+      {"theme": "perfect_features", "confidence": 0.91},
+      {"theme": "seamless_upgrade", "confidence": 0.88}
+    ],
+    "open_ended_emotions": [
+      {"emotion": "satisfaction", "intensity": 0.9, "confidence": 0.87}
+    ]
+  },
+  {
+    "id": "rec_008",
+    "contact_id": "contact_004",
+    "directory": "Enterprise Customers",
+    "directory_fields": {
+      "name": "David Kim",
+      "email": "david.kim@globaltech.com",
+      "phone": "+1-555-0404",
+      "company": "Global Tech Solutions",
+      "role": "CTO",
+      "industry": "Technology",
+      "annual_revenue": 500000,
+      "location": "Seattle, WA",
+      "join_date": "2022-11-20",
+      "segment": "Enterprise"
+    },
+    "activity": "Renewal",
+    "activity_fields": {
+      "product": "Enterprise License",
+      "amount": 29999.99,
+      "currency": "USD",
+      "renewal_type": "Early",
+      "discount_applied": 10,
+      "sales_rep": "Robert Taylor"
+    },
+    "feedback_recipient": {
+      "id": "team_account_mgmt",
+      "name": "Account Management",
+      "type": "team",
+      "email": "accounts@company.com"
+    },
+    "survey_id": "survey_renewal_experience",
+    "survey_title": "Renewal Experience Survey",
+    "channel": "email",
+    "sent_at": "2024-04-10T12:00:00Z",
+    "language": "en",
+    "status": "completed",
+    "participated_via": "email",
+    "participated_date": "2024-04-10T15:30:00Z",
+    "survey_response_link": "https://surveys.company.com/r/ren001",
+    "metrics_and_custom_metrics": {
+      "nps_score": 10,
+      "renewal_satisfaction": 9,
+      "account_manager_rating": 10,
+      "product_evolution": 8
+    },
+    "driver_scores": {
+      "product_reliability": 10,
+      "customer_support": 9,
+      "value_delivery": 9,
+      "innovation": 8
+    },
+    "open_ended_sentiment": "positive",
+    "open_ended_themes": [
+      {"theme": "exceptional_support", "confidence": 0.95},
+      {"theme": "product_reliability", "confidence": 0.92}
+    ],
+    "open_ended_emotions": [
+      {"emotion": "loyalty", "intensity": 0.9, "confidence": 0.88}
+    ]
+  },
+  {
+    "id": "rec_009",
+    "contact_id": "contact_005",
+    "directory": "SMB Customers",
+    "directory_fields": {
+      "name": "Lisa Chen",
+      "email": "lisa@boutiqueshop.com",
+      "phone": "+1-555-0505",
+      "company": "Boutique Online Shop",
+      "role": "Founder",
+      "industry": "E-commerce",
+      "annual_revenue": 75000,
+      "location": "Portland, OR",
+      "join_date": "2023-09-15",
+      "segment": "SMB"
+    },
+    "activity": "Support Ticket",
+    "activity_fields": {
+      "ticket_id": "SUP-2024-085",
+      "category": "Billing",
+      "priority": "Medium",
+      "resolution_time": 2.5,
+      "agent": "Tom Wilson",
+      "satisfaction_rating": 8
+    },
+    "feedback_recipient": {
+      "id": "team_support",
+      "name": "Customer Support",
+      "type": "team",
+      "email": "support@company.com"
+    },
+    "survey_id": "survey_support_csat",
+    "survey_title": "Support Experience Survey",
+    "channel": "sms",
+    "sent_at": "2024-03-20T14:00:00Z",
+    "language": "en",
+    "status": "completed",
+    "participated_via": "sms",
+    "participated_date": "2024-03-20T16:20:00Z",
+    "survey_response_link": "https://surveys.company.com/r/sup001",
+    "metrics_and_custom_metrics": {
+      "csat_score": 4,
+      "effort_score": 2,
+      "resolution_satisfaction": 8,
+      "agent_helpfulness": 9
+    },
+    "driver_scores": {
+      "response_time": 8,
+      "agent_knowledge": 9,
+      "issue_resolution": 8,
+      "follow_up": 7
+    },
+    "open_ended_sentiment": "positive",
+    "open_ended_themes": [
+      {"theme": "quick_resolution", "confidence": 0.87},
+      {"theme": "helpful_agent", "confidence": 0.84}
+    ],
+    "open_ended_emotions": [
+      {"emotion": "relief", "intensity": 0.8, "confidence": 0.79}
+    ]
+  },
+  {
+    "id": "rec_010",
+    "contact_id": "contact_006",
+    "directory": "SMB Customers",
+    "directory_fields": {
+      "name": "James Wilson",
+      "email": "james@startupventure.com",
+      "phone": "+1-555-0606",
+      "company": "Startup Venture",
+      "role": "CEO",
+      "industry": "Fintech",
+      "annual_revenue": 50000,
+      "location": "Denver, CO",
+      "join_date": "2024-04-01",
+      "segment": "SMB"
+    },
+    "activity": "Trial Conversion",
+    "activity_fields": {
+      "converted_to": "Starter Plan",
+      "amount": 49.99,
+      "currency": "USD",
+      "trial_duration_used": 10,
+      "conversion_trigger": "Feature Limit"
+    },
+    "feedback_recipient": {
+      "id": "team_conversion",
+      "name": "Conversion Team",
+      "type": "team",
+      "email": "conversion@company.com"
+    },
+    "survey_id": "survey_conversion",
+    "survey_title": "Trial to Paid Conversion Survey",
+    "channel": "email",
+    "sent_at": "2024-04-11T10:00:00Z",
+    "language": "en",
+    "status": "completed",
+    "participated_via": "email",
+    "participated_date": "2024-04-11T13:45:00Z",
+    "survey_response_link": "https://surveys.company.com/r/conv001",
+    "metrics_and_custom_metrics": {
+      "conversion_satisfaction": 8,
+      "trial_experience": 9,
+      "feature_adequacy": 7,
+      "pricing_fairness": 8
+    },
+    "driver_scores": {
+      "trial_length": 7,
+      "feature_set": 8,
+      "pricing": 8,
+      "support_quality": 9
+    },
+    "open_ended_sentiment": "positive",
+    "open_ended_themes": [
+      {"theme": "smooth_transition", "confidence": 0.81},
+      {"theme": "fair_pricing", "confidence": 0.85}
+    ],
+    "open_ended_emotions": [
+      {"emotion": "confidence", "intensity": 0.7, "confidence": 0.78}
+    ]
+  }
+]
