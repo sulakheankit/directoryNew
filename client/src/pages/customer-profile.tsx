@@ -132,7 +132,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
           </div>
         </header>
         <main className="p-6">
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {[...Array(4)].map((_, i) => (
                 <Skeleton key={i} className="h-32" />
@@ -209,7 +209,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
       </header>
 
       <main className="p-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Left Panel - Contact Info */}
             <div className="lg:col-span-1">
