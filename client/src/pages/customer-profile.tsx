@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { ContactWithData } from "@shared/schema";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ActivityTimeline from "@/components/activity-timeline";
 import SurveyHistory from "@/components/survey-history";
@@ -29,6 +29,9 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
     type: 'fixed',
     range: 'all',
   });
+
+  // Active tab state
+  const [activeTab, setActiveTab] = useState('activity');
 
   // Hidden contact fields state
   const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set());
@@ -375,30 +378,45 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                 </Card>
               </div>
 
-              <Tabs defaultValue="activity" className="w-full flex-1 flex flex-col">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="activity">Activity Timeline</TabsTrigger>
-                  <TabsTrigger value="surveys">Survey History</TabsTrigger>
-                  <TabsTrigger value="insights">NLP Insights</TabsTrigger>
-                  <TabsTrigger value="notes">Notes</TabsTrigger>
-                </TabsList>
+              <div className="w-full flex-1 flex flex-col">
+                {/* Simple Tab Navigation */}
+                <div className="flex border-b border-gray-200">
+                  {[
+                    { key: 'activity', label: 'Activity Timeline' },
+                    { key: 'surveys', label: 'Survey History' },
+                    { key: 'insights', label: 'NLP Insights' },
+                    { key: 'notes', label: 'Notes' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setActiveTab(tab.key)}
+                      className={`px-4 py-3 text-sm font-medium transition-colors relative ${
+                        activeTab === tab.key
+                          ? 'text-gray-900 border-b-2 border-black'
+                          : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
 
-                <TabsContent value="activity" className="space-y-6 mt-6 flex-1 overflow-y-auto">
-                  {filteredContact && <ActivityTimeline contact={filteredContact} />}
-                </TabsContent>
-
-                <TabsContent value="surveys" className="space-y-6 mt-6 flex-1 overflow-y-auto">
-                  {filteredContact && <SurveyHistory contact={filteredContact} />}
-                </TabsContent>
-
-                <TabsContent value="insights" className="space-y-6 mt-6 flex-1 overflow-y-auto">
-                  {filteredContact && <NLPInsights contact={filteredContact} />}
-                </TabsContent>
-
-                <TabsContent value="notes" className="space-y-6 mt-6 flex-1 overflow-y-auto">
-                  {filteredContact && <NotesSection contact={filteredContact} />}
-                </TabsContent>
-              </Tabs>
+                {/* Tab Content */}
+                <div className="flex-1 overflow-y-auto mt-6">
+                  {activeTab === 'activity' && filteredContact && (
+                    <ActivityTimeline contact={filteredContact} />
+                  )}
+                  {activeTab === 'surveys' && filteredContact && (
+                    <SurveyHistory contact={filteredContact} />
+                  )}
+                  {activeTab === 'insights' && filteredContact && (
+                    <NLPInsights contact={filteredContact} />
+                  )}
+                  {activeTab === 'notes' && filteredContact && (
+                    <NotesSection contact={filteredContact} />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
