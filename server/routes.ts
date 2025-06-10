@@ -171,8 +171,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 let directoryFields = {};
                 if (data['Directory Fields (JSONb)']) {
                   try {
-                    // Handle double-quoted JSON in CSV
-                    const jsonStr = data['Directory Fields (JSONb)'].replace(/^"|"$/g, '');
+                    // Handle escaped quotes in CSV JSON
+                    let jsonStr = data['Directory Fields (JSONb)'];
+                    // Remove outer quotes if they exist
+                    if (jsonStr.startsWith('"') && jsonStr.endsWith('"')) {
+                      jsonStr = jsonStr.slice(1, -1);
+                    }
+                    // Replace escaped quotes
+                    jsonStr = jsonStr.replace(/""/g, '"');
                     directoryFields = JSON.parse(jsonStr);
                     console.log("Successfully parsed directory fields for", contactId, ":", directoryFields);
                   } catch (e) {
@@ -195,7 +201,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 // Parse activity data
                 if (data['Activity'] && data['Activity Fields (JSONb)']) {
                   try {
-                    const activityFields = JSON.parse(data['Activity Fields (JSONb)']);
+                    let activityJsonStr = data['Activity Fields (JSONb)'];
+                    if (activityJsonStr.startsWith('"') && activityJsonStr.endsWith('"')) {
+                      activityJsonStr = activityJsonStr.slice(1, -1);
+                    }
+                    activityJsonStr = activityJsonStr.replace(/""/g, '"');
+                    const activityFields = JSON.parse(activityJsonStr);
+                    
                     const activityId = `activity_${contactId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                     
                     const activityData = {
@@ -214,12 +226,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 // Parse survey data
                 if (data['Survey ID'] && data['Survey Title']) {
                   try {
+                    // Helper function to parse JSON fields
+                    const parseJsonField = (jsonStr) => {
+                      if (!jsonStr) return null;
+                      if (jsonStr.startsWith('"') && jsonStr.endsWith('"')) {
+                        jsonStr = jsonStr.slice(1, -1);
+                      }
+                      return JSON.parse(jsonStr.replace(/""/g, '"'));
+                    };
+                    
                     const surveyData = {
                       id: data['Survey ID'],
                       contactId: contactId,
                       activityId: null,
                       surveyTitle: data['Survey Title'],
-                      feedbackRecipient: data['Feedback Recipient (JSONb)'] ? JSON.parse(data['Feedback Recipient (JSONb)']) : null,
+                      feedbackRecipient: data['Feedback Recipient (JSONb)'] ? parseJsonField(data['Feedback Recipient (JSONb)']) : null,
                       channel: data['Channel'] || 'email',
                       sentAt: data['Sent At'] ? new Date(data['Sent At']) : new Date(),
                       language: data['Language'] || 'en',
@@ -227,11 +248,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
                       participatedVia: data['Participated Via'] || null,
                       participatedDate: data['Participated Date'] ? new Date(data['Participated Date']) : null,
                       surveyResponseLink: data['Survey Response Link'] || null,
-                      metricsAndCustomMetrics: data['Metric and Custom Metric Scores (JSONb)'] ? JSON.parse(data['Metric and Custom Metric Scores (JSONb)']) : null,
-                      driverScores: data['Driver Scores (JSONb)'] ? JSON.parse(data['Driver Scores (JSONb)']) : null,
+                      metricsAndCustomMetrics: data['Metric and Custom Metric Scores (JSONb)'] ? parseJsonField(data['Metric and Custom Metric Scores (JSONb)']) : null,
+                      driverScores: data['Driver Scores (JSONb)'] ? parseJsonField(data['Driver Scores (JSONb)']) : null,
                       openEndedSentiment: data['Open-Ended Sentiment'] || null,
-                      openEndedThemes: data['Open-Ended Themes (JSONb)'] ? JSON.parse(data['Open-Ended Themes (JSONb)']) : null,
-                      openEndedEmotions: data['Open-Ended Emotions (JSONb)'] ? JSON.parse(data['Open-Ended Emotions (JSONb)']) : null
+                      openEndedThemes: data['Open-Ended Themes (JSONb)'] ? parseJsonField(data['Open-Ended Themes (JSONb)']) : null,
+                      openEndedEmotions: data['Open-Ended Emotions (JSONb)'] ? parseJsonField(data['Open-Ended Emotions (JSONb)']) : null
                     };
                     surveysMap.set(data['Survey ID'], surveyData);
                     console.log("Extracted CSV survey:", data['Survey ID']);
