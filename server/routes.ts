@@ -75,6 +75,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const surveysMap = new Map();
           
           for (const item of contactsArray) {
+            console.log("Processing item:", JSON.stringify(item, null, 2));
             const contactId = item.contact_id || item.id || `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             
             // Only add contact if we haven't seen this contact ID before
@@ -108,6 +109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 activityFields: item.activity_fields
               };
               activitiesMap.set(activityId, activityData);
+              console.log("Extracted activity:", activityId, "for contact:", contactId);
               
               // Store survey data
               if (item.survey_id && item.survey_title) {
@@ -131,6 +133,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   openEndedEmotions: item.open_ended_emotions
                 };
                 surveysMap.set(item.survey_id, surveyData);
+                console.log("Extracted survey:", item.survey_id, "for contact:", contactId);
               }
             }
           }
@@ -205,20 +208,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unsupported file format. Please upload a CSV or JSON file." });
       }
 
-      // Handle JSON import
+      // Handle JSON import with complete data processing
       if (fileName.endsWith('.json')) {
         const createdContacts = [];
         const createdActivities = [];
         const createdSurveys = [];
+        
         console.log(`Processing ${contacts.length} contacts for import`);
         
-        // First, create all contacts
+        // Get the additional data arrays
+        const activitiesData = (contacts as any).activitiesData || [];
+        const surveysData = (contacts as any).surveysData || [];
+        
+        // Create all contacts first
         for (const contactData of contacts) {
           try {
             console.log("Processing contact:", contactData.id, contactData.directory);
-            console.log("Directory fields:", contactData.directoryFields);
             
-            // Ensure required fields are present
             if (!contactData.id) {
               contactData.id = `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             }
@@ -227,20 +233,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             
             const validatedContact = insertContactSchema.parse(contactData);
-            console.log("Validated contact:", validatedContact);
-            
             const createdContact = await storage.createContact(validatedContact);
-            console.log("Created contact:", createdContact);
             createdContacts.push(createdContact);
+            console.log("Created contact:", createdContact.id);
           } catch (validationError) {
             console.error("Validation error for contact:", contactData.id, validationError);
           }
         }
         
-        // Then create activities and surveys
-        const activitiesData = req.activitiesData || [];
-        const surveysData = req.surveysData || [];
-        
+        // Create activities
         console.log(`Creating ${activitiesData.length} activities`);
         for (const activityData of activitiesData) {
           try {
@@ -253,6 +254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
+        // Create surveys
         console.log(`Creating ${surveysData.length} surveys`);
         for (const surveyData of surveysData) {
           try {

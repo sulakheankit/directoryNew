@@ -1,0 +1,64 @@
+[
+  {
+    "id": "rec_001",
+    "contact_id": "contact_001",
+    "directory": "Enterprise Customers",
+    "directory_fields": {
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@techcorp.com",
+      "phone": "+1-555-0101",
+      "company": "TechCorp Inc",
+      "role": "VP Marketing",
+      "industry": "Technology",
+      "annual_revenue": 250000,
+      "location": "San Francisco, CA",
+      "join_date": "2023-01-15",
+      "segment": "Enterprise"
+    },
+    "activity": "Purchase",
+    "activity_fields": {
+      "product": "Enterprise License",
+      "amount": 24999.99,
+      "currency": "USD",
+      "sales_rep": "Mike Chen",
+      "contract_duration": 12,
+      "payment_method": "Wire Transfer"
+    },
+    "feedback_recipient": {
+      "id": "team_sales",
+      "name": "Sales Team",
+      "type": "team",
+      "email": "sales@company.com"
+    },
+    "survey_id": "survey_nps_enterprise",
+    "survey_title": "Enterprise Purchase Experience",
+    "channel": "email",
+    "sent_at": "2024-01-20T10:00:00Z",
+    "language": "en",
+    "status": "completed",
+    "participated_via": "email",
+    "participated_date": "2024-01-20T14:30:00Z",
+    "survey_response_link": "https://surveys.company.com/r/ent001",
+    "metrics_and_custom_metrics": {
+      "nps_score": 9,
+      "csat_score": 5,
+      "ease_of_purchase": 8,
+      "sales_experience": 9,
+      "product_fit": 8
+    },
+    "driver_scores": {
+      "product_quality": 9,
+      "sales_support": 9,
+      "pricing": 7,
+      "implementation": 8
+    },
+    "open_ended_sentiment": "positive",
+    "open_ended_themes": [
+      {"theme": "excellent_support", "confidence": 0.92},
+      {"theme": "product_quality", "confidence": 0.88}
+    ],
+    "open_ended_emotions": [
+      {"emotion": "satisfaction", "intensity": 0.9, "confidence": 0.87}
+    ]
+  }
+]
