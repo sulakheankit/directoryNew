@@ -124,7 +124,7 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                 <TableHead className="px-6 py-3">Sent At</TableHead>
                 <TableHead className="px-6 py-3">Status</TableHead>
                 <TableHead className="px-6 py-3">Scores</TableHead>
-                <TableHead className="px-6 py-3">Actions</TableHead>
+                <TableHead className="px-6 py-3">Related Activity</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -171,10 +171,19 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                       <span className="text-xs text-gray-500">Not Completed</span>
                     )}
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-sm font-medium">
-                    <Button variant="link" className="text-primary hover:text-blue-900 p-0">
-                      {survey.status === 'Completed' ? 'View Details' : 'Resend'}
-                    </Button>
+                  <TableCell className="px-6 py-4 text-sm">
+                    {survey.activityId ? (
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {contact.activities.find(activity => activity.id === survey.activityId)?.activity || 'Unknown Activity'}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {survey.activityId}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-500">No related activity</span>
+                    )}
                   </TableCell>
                 </TableRow>,
 
@@ -238,19 +247,19 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                               <div>
                                 <span className="font-medium">Key Themes:</span>{' '}
                                 {Array.isArray(survey.openEndedThemes) ? 
-                                  survey.openEndedThemes.join(', ') : 
-                                  typeof survey.openEndedThemes === 'object' && survey.openEndedThemes ?
-                                    Object.values(survey.openEndedThemes as any).join(', ') :
-                                    'N/A'
+                                  survey.openEndedThemes.map((theme: any) => 
+                                    typeof theme === 'string' ? theme : (theme.theme || theme.name || theme)
+                                  ).join(', ') : 
+                                  'N/A'
                                 }
                               </div>
                               <div>
                                 <span className="font-medium">Emotions:</span>{' '}
                                 {Array.isArray(survey.openEndedEmotions) ? 
-                                  survey.openEndedEmotions.join(', ') : 
-                                  typeof survey.openEndedEmotions === 'object' && survey.openEndedEmotions ?
-                                    Object.values(survey.openEndedEmotions as any).join(', ') :
-                                    'N/A'
+                                  survey.openEndedEmotions.map((emotion: any) => 
+                                    typeof emotion === 'string' ? emotion : (emotion.emotion || emotion.name || emotion)
+                                  ).join(', ') : 
+                                  'N/A'
                                 }
                               </div>
                             </div>
