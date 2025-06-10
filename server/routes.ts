@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertNoteSchema, insertContactSchema } from "@shared/schema";
+import { insertNoteSchema, insertContactSchema, insertActivitySchema, insertSurveySchema } from "@shared/schema";
 import multer from "multer";
 import csv from "csv-parser";
 import { Readable } from "stream";
@@ -69,13 +69,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const jsonData = JSON.parse(fileContent);
           const contactsArray = Array.isArray(jsonData) ? jsonData : [jsonData];
           
-          // Transform the data format and extract unique contacts
+          // Transform the data format and extract unique contacts with associated data
           const contactMap = new Map();
+          const activitiesMap = new Map();
+          const surveysMap = new Map();
           
           for (const item of contactsArray) {
             const contactId = item.contact_id || item.id || `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             
-            // Only add if we haven't seen this contact ID before
+            // Only add contact if we haven't seen this contact ID before
             if (!contactMap.has(contactId)) {
               const contact = {
                 id: contactId,
@@ -95,10 +97,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
               };
               contactMap.set(contactId, contact);
             }
+            
+            // Store activity data
+            if (item.activity && item.activity_fields) {
+              const activityId = `activity_${item.id || Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+              const activityData = {
+                id: activityId,
+                contactId: contactId,
+                activity: item.activity,
+                activityFields: item.activity_fields
+              };
+              activitiesMap.set(activityId, activityData);
+              
+              // Store survey data
+              if (item.survey_id && item.survey_title) {
+                const surveyData = {
+                  id: item.survey_id,
+                  contactId: contactId,
+                  activityId: activityId,
+                  surveyTitle: item.survey_title,
+                  feedbackRecipient: item.feedback_recipient,
+                  channel: item.channel,
+                  sentAt: new Date(item.sent_at),
+                  language: item.language || "English",
+                  status: item.status,
+                  participatedVia: item.participated_via,
+                  participatedDate: item.participated_date ? new Date(item.participated_date) : null,
+                  surveyResponseLink: item.survey_response_link,
+                  metricsAndCustomMetrics: item.metrics_and_custom_metrics,
+                  driverScores: item.driver_scores,
+                  openEndedSentiment: item.open_ended_sentiment,
+                  openEndedThemes: item.open_ended_themes,
+                  openEndedEmotions: item.open_ended_emotions
+                };
+                surveysMap.set(item.survey_id, surveyData);
+              }
+            }
           }
           
-          // Convert map values to array
+          // Convert maps to arrays
           contacts.push(...Array.from(contactMap.values()));
+          
+          // Store additional data for processing
+          (contacts as any).activitiesData = Array.from(activitiesMap.values());
+          (contacts as any).surveysData = Array.from(surveysMap.values());
         } catch (error) {
           console.error("JSON parsing error:", error);
           return res.status(400).json({ message: "Invalid JSON format: " + (error as Error).message });
@@ -166,8 +208,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle JSON import
       if (fileName.endsWith('.json')) {
         const createdContacts = [];
+        const createdActivities = [];
+        const createdSurveys = [];
         console.log(`Processing ${contacts.length} contacts for import`);
         
+        // First, create all contacts
         for (const contactData of contacts) {
           try {
             console.log("Processing contact:", contactData.id, contactData.directory);
@@ -192,11 +237,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
-        console.log(`Successfully created ${createdContacts.length} contacts`);
+        // Then create activities and surveys
+        const activitiesData = req.activitiesData || [];
+        const surveysData = req.surveysData || [];
+        
+        console.log(`Creating ${activitiesData.length} activities`);
+        for (const activityData of activitiesData) {
+          try {
+            const validatedActivity = insertActivitySchema.parse(activityData);
+            const createdActivity = await storage.createActivity(validatedActivity);
+            createdActivities.push(createdActivity);
+            console.log("Created activity:", createdActivity.id, "for contact:", createdActivity.contactId);
+          } catch (validationError) {
+            console.error("Validation error for activity:", activityData.id, validationError);
+          }
+        }
+        
+        console.log(`Creating ${surveysData.length} surveys`);
+        for (const surveyData of surveysData) {
+          try {
+            const validatedSurvey = insertSurveySchema.parse(surveyData);
+            const createdSurvey = await storage.createSurvey(validatedSurvey);
+            createdSurveys.push(createdSurvey);
+            console.log("Created survey:", createdSurvey.id, "for contact:", createdSurvey.contactId);
+          } catch (validationError) {
+            console.error("Validation error for survey:", surveyData.id, validationError);
+          }
+        }
+        
+        console.log(`Successfully created ${createdContacts.length} contacts, ${createdActivities.length} activities, ${createdSurveys.length} surveys`);
         res.json({ 
-          message: `Successfully imported ${createdContacts.length} contacts`,
+          message: `Successfully imported ${createdContacts.length} contacts with ${createdActivities.length} activities and ${createdSurveys.length} surveys`,
           imported: createdContacts.length,
-          contacts: createdContacts
+          contacts: createdContacts,
+          activities: createdActivities,
+          surveys: createdSurveys
         });
       }
 
