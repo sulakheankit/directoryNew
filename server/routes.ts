@@ -214,7 +214,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                       id: activityId,
                       contactId: contactId,
                       activity: data['Activity'],
-                      activityFields: activityFields
+                      activityFields: activityFields,
+                      activityUploadDate: data['Activity Upload Date'] ? new Date(data['Activity Upload Date']) : null
                     };
                     activitiesMap.set(activityId, activityData);
                     console.log("Extracted CSV activity:", activityId, data['Activity']);

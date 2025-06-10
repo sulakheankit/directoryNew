@@ -15,6 +15,7 @@ export const activities = pgTable("activities", {
   contactId: text("contact_id").notNull().references(() => contacts.id),
   activity: text("activity").notNull(),
   activityFields: jsonb("activity_fields"),
+  activityUploadDate: timestamp("activity_upload_date"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

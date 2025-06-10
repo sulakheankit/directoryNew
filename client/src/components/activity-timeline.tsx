@@ -65,36 +65,45 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
     );
   };
 
-  // Combine activities and surveys into timeline items
-  const timelineItems: TimelineItem[] = [
-    ...contact.activities.map((activity): TimelineItem => ({
+  // Get sentiment-based card styling
+  const getSentimentCardStyle = (sentiment: string | null | undefined) => {
+    if (!sentiment) return '';
+    switch (sentiment.toLowerCase()) {
+      case 'positive':
+        return 'border-green-500 border-2';
+      case 'negative':
+        return 'border-red-500 border-2';
+      default:
+        return 'border-yellow-500 border-2';
+    }
+  };
+
+  // Create timeline items from activities only, with linked survey information
+  const timelineItems: TimelineItem[] = contact.activities.map((activity): TimelineItem => {
+    // Find surveys linked to this activity
+    const linkedSurveys = contact.surveys.filter(survey => 
+      survey.activityId === activity.id
+    );
+    
+    // Get the primary survey for status and sentiment
+    const primarySurvey = linkedSurveys[0];
+    
+    return {
       id: activity.id,
       type: 'activity',
       title: activity.activity,
       subtitle: `Activity ID: ${(activity.activityFields as any)?.ticket_id || (activity.activityFields as any)?.order_id || activity.id}`,
-      date: new Date(activity.createdAt),
-      status: activity.activity === 'Support Ticket' ? 'Resolved' : 'Completed',
+      date: (activity as any).activityUploadDate ? new Date((activity as any).activityUploadDate) : new Date(activity.createdAt),
+      status: primarySurvey?.status,
       icon: getActivityIcon(activity.activity),
-      details: activity.activityFields as any || {}
-    })),
-    ...contact.surveys.map((survey): TimelineItem => ({
-      id: survey.id,
-      type: 'survey',
-      title: survey.surveyTitle,
-      subtitle: `Survey ID: ${survey.id}`,
-      date: new Date(survey.sentAt),
-      status: survey.status,
-      icon: <Vote className="h-4 w-4 text-primary" />,
       details: {
-        channel: survey.channel,
-        participationMethod: survey.participationMethod,
-        responseTime: survey.participationDate ? 
-          `${Math.round((new Date(survey.participationDate).getTime() - new Date(survey.sentAt).getTime()) / (1000 * 60 * 60))} hours` : 
-          'N/A',
-        metricScores: survey.metricScores
+        activityFields: activity.activityFields as any || {},
+        uploadDate: (activity as any).activityUploadDate,
+        surveys: linkedSurveys,
+        sentiment: primarySurvey?.openEndedSentiment
       }
-    }))
-  ].sort((a, b) => b.date.getTime() - a.date.getTime());
+    };
+  }).sort((a, b) => b.date.getTime() - a.date.getTime());
 
   const filteredItems = timelineItems.filter(item => {
     if (filter !== "all" && !item.title.toLowerCase().includes(filter.toLowerCase())) {
@@ -132,9 +141,9 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
               {/* Timeline dot */}
               <div className="absolute left-2.5 w-3 h-3 bg-primary rounded-full border-2 border-white shadow"></div>
               
-              {/* Timeline card */}
+              {/* Timeline card with sentiment-based outline */}
               <Card 
-                className="ml-10 p-4 hover:shadow-md transition-all duration-200 cursor-pointer"
+                className={`ml-10 p-4 hover:shadow-md transition-all duration-200 cursor-pointer ${getSentimentCardStyle(item.details.sentiment)}`}
                 onClick={() => toggleExpanded(item.id)}
               >
                 <div className="flex items-center justify-between">
@@ -163,64 +172,87 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
 
                 {/* Expanded details */}
                 {expandedItems.has(item.id) && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      {item.type === 'survey' ? (
-                        <>
-                          {item.details.channel && (
-                            <div>
-                              <span className="font-medium text-gray-700">Channel:</span>
-                              <span className="text-gray-600 ml-2">{item.details.channel}</span>
-                            </div>
-                          )}
-                          {item.details.responseTime && (
-                            <div>
-                              <span className="font-medium text-gray-700">Response Time:</span>
-                              <span className="text-gray-600 ml-2">{item.details.responseTime}</span>
-                            </div>
-                          )}
-                          {item.details.metricScores?.nps && (
-                            <div>
-                              <span className="font-medium text-gray-700">NPS Score:</span>
-                              <span className="text-green-600 font-medium ml-2">{item.details.metricScores.nps}</span>
-                            </div>
-                          )}
-                          {item.details.metricScores?.csat && (
-                            <div>
-                              <span className="font-medium text-gray-700">CSAT Score:</span>
-                              <span className="text-primary font-medium ml-2">{item.details.metricScores.csat}</span>
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          {item.details.category && (
-                            <div>
-                              <span className="font-medium text-gray-700">Category:</span>
-                              <span className="text-gray-600 ml-2">{item.details.category}</span>
-                            </div>
-                          )}
-                          {item.details.priority && (
-                            <div>
-                              <span className="font-medium text-gray-700">Priority:</span>
-                              <span className="text-gray-600 ml-2">{item.details.priority}</span>
-                            </div>
-                          )}
-                          {item.details.amount && (
-                            <div>
-                              <span className="font-medium text-gray-700">Amount:</span>
-                              <span className="text-gray-600 ml-2">${item.details.amount.toLocaleString()}</span>
-                            </div>
-                          )}
-                          {item.details.product && (
-                            <div>
-                              <span className="font-medium text-gray-700">Product:</span>
-                              <span className="text-gray-600 ml-2">{item.details.product}</span>
-                            </div>
-                          )}
-                        </>
-                      )}
+                  <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
+                    {/* Activity Attributes */}
+                    <div>
+                      <h5 className="text-sm font-medium text-gray-900 mb-2">Activity Attributes</h5>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        {item.details.uploadDate && (
+                          <div>
+                            <span className="font-medium text-gray-700">Upload Date:</span>
+                            <span className="text-gray-600 ml-2">
+                              {new Date(item.details.uploadDate).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                              })}
+                            </span>
+                          </div>
+                        )}
+                        {Object.entries(item.details.activityFields || {}).map(([key, value]) => (
+                          <div key={key}>
+                            <span className="font-medium text-gray-700">
+                              {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
+                            </span>
+                            <span className="text-gray-600 ml-2">{String(value)}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
+
+                    {/* Survey Response Details */}
+                    {item.details.surveys && item.details.surveys.length > 0 && (
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-900 mb-2">Survey Response Details</h5>
+                        {item.details.surveys.map((survey: any, index: number) => (
+                          <div key={survey.id} className="border border-gray-200 rounded-lg p-3 mb-2 last:mb-0">
+                            <div className="flex items-center justify-between mb-2">
+                              <h6 className="text-sm font-medium text-gray-800">{survey.title}</h6>
+                              <Badge className={
+                                survey.status === 'Completed' || survey.status === 'completed' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-yellow-100 text-yellow-800'
+                              }>
+                                {survey.status}
+                              </Badge>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              {survey.channel && (
+                                <div>
+                                  <span className="font-medium text-gray-600">Channel:</span>
+                                  <span className="text-gray-500 ml-1">{survey.channel}</span>
+                                </div>
+                              )}
+                              {survey.responseTime && (
+                                <div>
+                                  <span className="font-medium text-gray-600">Response Time:</span>
+                                  <span className="text-gray-500 ml-1">{survey.responseTime}</span>
+                                </div>
+                              )}
+                              {survey.sentiment && (
+                                <div>
+                                  <span className="font-medium text-gray-600">Sentiment:</span>
+                                  <span className={`ml-1 font-medium ${
+                                    survey.sentiment === 'positive' ? 'text-green-600' :
+                                    survey.sentiment === 'negative' ? 'text-red-600' : 'text-yellow-600'
+                                  }`}>
+                                    {survey.sentiment.charAt(0).toUpperCase() + survey.sentiment.slice(1)}
+                                  </span>
+                                </div>
+                              )}
+                              {survey.metricScores && Object.entries(survey.metricScores).slice(0, 3).map(([key, value]) => (
+                                <div key={key}>
+                                  <span className="font-medium text-gray-600">
+                                    {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
+                                  </span>
+                                  <span className="text-gray-700 font-medium ml-1">{String(value)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </Card>
