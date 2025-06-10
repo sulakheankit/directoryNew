@@ -8,8 +8,6 @@ interface NLPInsightsProps {
 }
 
 export default function NLPInsights({ contact }: NLPInsightsProps) {
-  const insights = contact.nlpInsights;
-  
   // Extract real sentiment data from imported surveys
   const surveyInsights = contact.surveys.map(survey => ({
     id: survey.id,
@@ -41,106 +39,12 @@ export default function NLPInsights({ contact }: NLPInsightsProps) {
     }
   };
 
-  const getAnalysisBorderColor = (sentiment: string) => {
-    switch (sentiment) {
-      case 'positive':
-        return 'border-l-green-400';
-      case 'negative':
-        return 'border-l-red-400';
-      default:
-        return 'border-l-yellow-400';
-    }
-  };
-
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-medium text-gray-900">NLP Insights</h3>
-      
-      {/* Sentiment Analysis Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className={`${getSentimentBgColor(insights.overallSentiment)}`}>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <Smile className={`h-8 w-8 ${getSentimentColor(insights.overallSentiment)} mr-3`} />
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900">Overall Sentiment</h4>
-                <p className={`text-2xl font-bold ${getSentimentColor(insights.overallSentiment)}`}>
-                  {insights.overallSentiment.charAt(0).toUpperCase() + insights.overallSentiment.slice(1)}
-                </p>
-                <p className="text-sm text-gray-600">{insights.confidence}% confidence</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-blue-50">
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <Brain className="h-8 w-8 text-primary mr-3" />
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900">Key Themes</h4>
-                <p className="text-sm text-gray-600 mt-1">
-                  {insights.themes.join(', ')}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-purple-50">
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <Heart className="h-8 w-8 text-purple-600 mr-3" />
-              <div>
-                <h4 className="text-lg font-semibold text-gray-900">Emotions</h4>
-                <p className="text-sm text-gray-600 mt-1">
-                  {insights.emotions.join(', ')}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Detailed Analysis */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-medium text-gray-900">Feedback Analysis</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {insights.analysis.map((item, index) => (
-            <div 
-              key={index} 
-              className={`border-l-4 ${getAnalysisBorderColor(item.sentiment)} pl-4`}
-            >
-              <h5 className="font-medium text-gray-900">
-                {item.theme} ({item.sentiment.charAt(0).toUpperCase() + item.sentiment.slice(1)})
-              </h5>
-              <p className="text-sm text-gray-600 mt-1 italic">
-                "{item.quote}"
-              </p>
-              <div className="flex space-x-2 mt-2">
-                {item.emotions.map((emotion, emotionIndex) => (
-                  <Badge
-                    key={emotionIndex}
-                    variant="secondary"
-                    className={`
-                      ${item.sentiment === 'positive' && 'bg-green-100 text-green-800'}
-                      ${item.sentiment === 'negative' && 'bg-red-100 text-red-800'}
-                      ${item.sentiment === 'neutral' && 'bg-yellow-100 text-yellow-800'}
-                    `}
-                  >
-                    {emotion}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
 
       {/* Survey-Based Insights from Imported Data */}
-      {surveyInsights.length > 0 && (
+      {surveyInsights.length > 0 ? (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-medium text-gray-900">Survey Response Analysis</CardTitle>
@@ -163,9 +67,13 @@ export default function NLPInsights({ contact }: NLPInsightsProps) {
                       <span className="font-medium">Themes:</span>{' '}
                       <span className="text-gray-600">
                         {Array.isArray(survey.themes) ? 
-                          survey.themes.join(', ') : 
+                          survey.themes.map((theme: any) => 
+                            typeof theme === 'object' ? theme.theme || theme.name : theme
+                          ).join(', ') : 
                           typeof survey.themes === 'object' && survey.themes ?
-                            Object.values(survey.themes as any).join(', ') :
+                            Object.values(survey.themes as any).map((theme: any) => 
+                              typeof theme === 'object' ? theme.theme || theme.name || theme : theme
+                            ).join(', ') :
                             survey.themes
                         }
                       </span>
@@ -176,9 +84,13 @@ export default function NLPInsights({ contact }: NLPInsightsProps) {
                       <span className="font-medium">Emotions:</span>{' '}
                       <span className="text-gray-600">
                         {Array.isArray(survey.emotions) ? 
-                          survey.emotions.join(', ') : 
+                          survey.emotions.map((emotion: any) => 
+                            typeof emotion === 'object' ? emotion.emotion || emotion.name : emotion
+                          ).join(', ') : 
                           typeof survey.emotions === 'object' && survey.emotions ?
-                            Object.values(survey.emotions as any).join(', ') :
+                            Object.values(survey.emotions as any).map((emotion: any) => 
+                              typeof emotion === 'object' ? emotion.emotion || emotion.name || emotion : emotion
+                            ).join(', ') :
                             survey.emotions
                         }
                       </span>
@@ -187,6 +99,12 @@ export default function NLPInsights({ contact }: NLPInsightsProps) {
                 </div>
               </div>
             ))}
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-6 text-center">
+            <p className="text-gray-500">No sentiment analysis data available from imported surveys.</p>
           </CardContent>
         </Card>
       )}
