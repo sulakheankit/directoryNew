@@ -159,16 +159,21 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                     {getStatusBadge(survey.status)}
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    {survey.metricScores ? (
+                    {(survey as any).metricsAndCustomMetrics ? (
                       <div className="flex space-x-2">
-                        {(survey.metricScores as any).nps && (
+                        {(survey as any).metricsAndCustomMetrics.nps_score && (
                           <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            NPS: {(survey.metricScores as any).nps}
+                            NPS: {(survey as any).metricsAndCustomMetrics.nps_score}
                           </Badge>
                         )}
-                        {(survey.metricScores as any).csat && (
+                        {(survey as any).metricsAndCustomMetrics.csat_score && (
                           <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                            CSAT: {(survey.metricScores as any).csat}
+                            CSAT: {(survey as any).metricsAndCustomMetrics.csat_score}
+                          </Badge>
+                        )}
+                        {(survey as any).metricsAndCustomMetrics.ease_of_purchase && (
+                          <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                            EOP: {(survey as any).metricsAndCustomMetrics.ease_of_purchase}
                           </Badge>
                         )}
                       </div>
@@ -187,33 +192,56 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                 expandedRows.has(survey.id) && (
                   <TableRow key={`${survey.id}-expanded`} className="bg-gray-50">
                     <TableCell colSpan={6} className="px-6 py-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                           <h4 className="text-sm font-medium text-gray-900 mb-2">Response Details</h4>
                           <div className="space-y-2 text-sm">
                             <div>
                               <span className="font-medium">Participation Method:</span>{' '}
-                              {survey.participationMethod || 'N/A'}
+                              {(survey as any).participatedVia || 'N/A'}
                             </div>
                             <div>
                               <span className="font-medium">Response Time:</span>{' '}
-                              {survey.participationDate ? 
-                                `${Math.round((new Date(survey.participationDate).getTime() - new Date(survey.sentAt).getTime()) / (1000 * 60 * 60))} hours after sent` : 
+                              {(survey as any).participatedDate ? 
+                                `${Math.round((new Date((survey as any).participatedDate).getTime() - new Date(survey.sentAt).getTime()) / (1000 * 60 * 60))} hours after sent` : 
                                 'N/A'
                               }
                             </div>
                             <div>
                               <span className="font-medium">Language:</span> {survey.language}
                             </div>
+                            <div>
+                              <span className="font-medium">Survey Link:</span>{' '}
+                              {(survey as any).surveyResponseLink ? (
+                                <a href={(survey as any).surveyResponseLink} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                                  View Response
+                                </a>
+                              ) : 'N/A'}
+                            </div>
                           </div>
                         </div>
+
+                        {(survey as any).driverScores && (
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-900 mb-2">Driver Scores</h4>
+                            <div className="space-y-2 text-sm">
+                              {Object.entries((survey as any).driverScores as any).map(([key, value]) => (
+                                <div key={key}>
+                                  <span className="font-medium">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>{' '}
+                                  <span className="text-gray-600">{value as string}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
                         {survey.openEndedSentiment && (
                           <div>
-                            <h4 className="text-sm font-medium text-gray-900 mb-2">Feedback Summary</h4>
+                            <h4 className="text-sm font-medium text-gray-900 mb-2">Feedback Analysis</h4>
                             <div className="space-y-2 text-sm">
                               <div>
                                 <span className="font-medium">Sentiment:</span>{' '}
-                                <span className={survey.openEndedSentiment === 'positive' ? 'text-green-600' : 'text-gray-600'}>
+                                <span className={survey.openEndedSentiment === 'positive' ? 'text-green-600' : survey.openEndedSentiment === 'negative' ? 'text-red-600' : 'text-gray-600'}>
                                   {survey.openEndedSentiment.charAt(0).toUpperCase() + survey.openEndedSentiment.slice(1)}
                                 </span>
                               </div>
@@ -221,14 +249,18 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                                 <span className="font-medium">Key Themes:</span>{' '}
                                 {Array.isArray(survey.openEndedThemes) ? 
                                   survey.openEndedThemes.join(', ') : 
-                                  'N/A'
+                                  typeof survey.openEndedThemes === 'object' && survey.openEndedThemes ?
+                                    Object.values(survey.openEndedThemes as any).join(', ') :
+                                    'N/A'
                                 }
                               </div>
                               <div>
                                 <span className="font-medium">Emotions:</span>{' '}
                                 {Array.isArray(survey.openEndedEmotions) ? 
                                   survey.openEndedEmotions.join(', ') : 
-                                  'N/A'
+                                  typeof survey.openEndedEmotions === 'object' && survey.openEndedEmotions ?
+                                    Object.values(survey.openEndedEmotions as any).join(', ') :
+                                    'N/A'
                                 }
                               </div>
                             </div>
