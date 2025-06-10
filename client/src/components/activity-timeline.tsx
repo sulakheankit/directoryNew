@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronDown, ChevronUp, Vote, Headphones, ShoppingCart, Mail } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -170,89 +171,189 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
                   </div>
                 </div>
 
-                {/* Expanded details */}
+                {/* Expanded details with tabs */}
                 {expandedItems.has(item.id) && (
-                  <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
-                    {/* Activity Attributes */}
-                    <div>
-                      <h5 className="text-sm font-medium text-gray-900 mb-2">Activity Attributes</h5>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        {item.details.uploadDate && (
-                          <div>
-                            <span className="font-medium text-gray-700">Upload Date:</span>
-                            <span className="text-gray-600 ml-2">
-                              {new Date(item.details.uploadDate).toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric', 
-                                year: 'numeric' 
-                              })}
-                            </span>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    {item.details.surveys && item.details.surveys.length > 0 ? (
+                      <Tabs defaultValue="activity" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2">
+                          <TabsTrigger value="activity">Activity Attributes</TabsTrigger>
+                          <TabsTrigger value="survey">Survey Details</TabsTrigger>
+                        </TabsList>
+                        
+                        <TabsContent value="activity" className="mt-4">
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            {item.details.uploadDate && (
+                              <div>
+                                <span className="font-medium text-gray-700">Upload Date:</span>
+                                <span className="text-gray-600 ml-2">
+                                  {new Date(item.details.uploadDate).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric', 
+                                    year: 'numeric' 
+                                  })}
+                                </span>
+                              </div>
+                            )}
+                            {Object.entries(item.details.activityFields || {}).map(([key, value]) => (
+                              <div key={key}>
+                                <span className="font-medium text-gray-700">
+                                  {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
+                                </span>
+                                <span className="text-gray-600 ml-2">{String(value)}</span>
+                              </div>
+                            ))}
                           </div>
-                        )}
-                        {Object.entries(item.details.activityFields || {}).map(([key, value]) => (
-                          <div key={key}>
-                            <span className="font-medium text-gray-700">
-                              {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
-                            </span>
-                            <span className="text-gray-600 ml-2">{String(value)}</span>
+                        </TabsContent>
+                        
+                        <TabsContent value="survey" className="mt-4">
+                          <div className="space-y-3">
+                            {item.details.surveys.map((survey: any, index: number) => (
+                              <div key={survey.id} className="border border-gray-200 rounded-lg p-3">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h6 className="text-sm font-medium text-gray-800">{survey.surveyTitle}</h6>
+                                  <Badge className={
+                                    survey.status === 'Completed' || survey.status === 'completed' 
+                                      ? 'bg-green-100 text-green-800' 
+                                      : 'bg-yellow-100 text-yellow-800'
+                                  }>
+                                    {survey.status}
+                                  </Badge>
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-3 text-xs">
+                                  {survey.channel && (
+                                    <div>
+                                      <span className="font-medium text-gray-600">Channel:</span>
+                                      <span className="text-gray-500 ml-1">{survey.channel}</span>
+                                    </div>
+                                  )}
+                                  {survey.sentAt && (
+                                    <div>
+                                      <span className="font-medium text-gray-600">Sent:</span>
+                                      <span className="text-gray-500 ml-1">
+                                        {new Date(survey.sentAt).toLocaleDateString('en-US', { 
+                                          month: 'short', 
+                                          day: 'numeric', 
+                                          year: 'numeric' 
+                                        })}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {survey.participatedDate && (
+                                    <div>
+                                      <span className="font-medium text-gray-600">Responded:</span>
+                                      <span className="text-gray-500 ml-1">
+                                        {new Date(survey.participatedDate).toLocaleDateString('en-US', { 
+                                          month: 'short', 
+                                          day: 'numeric', 
+                                          year: 'numeric' 
+                                        })}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {survey.participatedVia && (
+                                    <div>
+                                      <span className="font-medium text-gray-600">Participated Via:</span>
+                                      <span className="text-gray-500 ml-1">{survey.participatedVia}</span>
+                                    </div>
+                                  )}
+                                  {survey.openEndedSentiment && (
+                                    <div>
+                                      <span className="font-medium text-gray-600">Sentiment:</span>
+                                      <span className={`ml-1 font-medium ${
+                                        survey.openEndedSentiment === 'positive' ? 'text-green-600' :
+                                        survey.openEndedSentiment === 'negative' ? 'text-red-600' : 'text-yellow-600'
+                                      }`}>
+                                        {survey.openEndedSentiment.charAt(0).toUpperCase() + survey.openEndedSentiment.slice(1)}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {survey.language && (
+                                    <div>
+                                      <span className="font-medium text-gray-600">Language:</span>
+                                      <span className="text-gray-500 ml-1">{survey.language}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {/* Metric Scores */}
+                                {survey.metricScores && Object.keys(survey.metricScores).length > 0 && (
+                                  <div className="mt-3 pt-3 border-t border-gray-100">
+                                    <h6 className="text-xs font-medium text-gray-700 mb-2">Metric Scores</h6>
+                                    <div className="grid grid-cols-3 gap-2">
+                                      {Object.entries(survey.metricScores).map(([key, value]) => (
+                                        <div key={key} className="text-center">
+                                          <div className="text-xs text-gray-500">
+                                            {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                          </div>
+                                          <div className="text-sm font-medium text-gray-800">{String(value)}</div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {/* Themes and Emotions */}
+                                {(survey.openEndedThemes || survey.openEndedEmotions) && (
+                                  <div className="mt-3 pt-3 border-t border-gray-100">
+                                    {survey.openEndedThemes && Array.isArray(survey.openEndedThemes) && survey.openEndedThemes.length > 0 && (
+                                      <div className="mb-2">
+                                        <span className="text-xs font-medium text-gray-600">Themes:</span>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                          {survey.openEndedThemes.map((theme: string, idx: number) => (
+                                            <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                                              {theme}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {survey.openEndedEmotions && Array.isArray(survey.openEndedEmotions) && survey.openEndedEmotions.length > 0 && (
+                                      <div>
+                                        <span className="text-xs font-medium text-gray-600">Emotions:</span>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                          {survey.openEndedEmotions.map((emotion: string, idx: number) => (
+                                            <span key={idx} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded">
+                                              {emotion}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Survey Response Details */}
-                    {item.details.surveys && item.details.surveys.length > 0 && (
+                        </TabsContent>
+                      </Tabs>
+                    ) : (
+                      // Show only activity attributes if no surveys
                       <div>
-                        <h5 className="text-sm font-medium text-gray-900 mb-2">Survey Response Details</h5>
-                        {item.details.surveys.map((survey: any, index: number) => (
-                          <div key={survey.id} className="border border-gray-200 rounded-lg p-3 mb-2 last:mb-0">
-                            <div className="flex items-center justify-between mb-2">
-                              <h6 className="text-sm font-medium text-gray-800">{survey.surveyTitle}</h6>
-                              <Badge className={
-                                survey.status === 'Completed' || survey.status === 'completed' 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : 'bg-yellow-100 text-yellow-800'
-                              }>
-                                {survey.status}
-                              </Badge>
+                        <h5 className="text-sm font-medium text-gray-900 mb-3">Activity Attributes</h5>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          {item.details.uploadDate && (
+                            <div>
+                              <span className="font-medium text-gray-700">Upload Date:</span>
+                              <span className="text-gray-600 ml-2">
+                                {new Date(item.details.uploadDate).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric', 
+                                  year: 'numeric' 
+                                })}
+                              </span>
                             </div>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                              {survey.channel && (
-                                <div>
-                                  <span className="font-medium text-gray-600">Channel:</span>
-                                  <span className="text-gray-500 ml-1">{survey.channel}</span>
-                                </div>
-                              )}
-                              {survey.participationDate && (
-                                <div>
-                                  <span className="font-medium text-gray-600">Response Time:</span>
-                                  <span className="text-gray-500 ml-1">
-                                    {Math.round((new Date(survey.participationDate).getTime() - new Date(survey.sentAt).getTime()) / (1000 * 60 * 60))} hours
-                                  </span>
-                                </div>
-                              )}
-                              {survey.openEndedSentiment && (
-                                <div>
-                                  <span className="font-medium text-gray-600">Sentiment:</span>
-                                  <span className={`ml-1 font-medium ${
-                                    survey.openEndedSentiment === 'positive' ? 'text-green-600' :
-                                    survey.openEndedSentiment === 'negative' ? 'text-red-600' : 'text-yellow-600'
-                                  }`}>
-                                    {survey.openEndedSentiment.charAt(0).toUpperCase() + survey.openEndedSentiment.slice(1)}
-                                  </span>
-                                </div>
-                              )}
-                              {survey.metricScores && Object.entries(survey.metricScores).slice(0, 3).map(([key, value]) => (
-                                <div key={key}>
-                                  <span className="font-medium text-gray-600">
-                                    {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
-                                  </span>
-                                  <span className="text-gray-700 font-medium ml-1">{String(value)}</span>
-                                </div>
-                              ))}
+                          )}
+                          {Object.entries(item.details.activityFields || {}).map(([key, value]) => (
+                            <div key={key}>
+                              <span className="font-medium text-gray-700">
+                                {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
+                              </span>
+                              <span className="text-gray-600 ml-2">{String(value)}</span>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
