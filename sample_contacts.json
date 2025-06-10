@@ -1,0 +1,34 @@
+[
+  {
+    "id": "contact_009",
+    "directory": "Car Rental Customers",
+    "directoryFields": {
+      "name": "Michael Brown",
+      "email": "michael.brown@enterprise.com",
+      "phone": "+1-555-0126",
+      "company": "Brown Enterprises",
+      "role": "CEO",
+      "industry": "Consulting",
+      "annual_revenue": 200000,
+      "location": "Miami, Florida",
+      "join_date": "2022-12-01",
+      "segment": "Enterprise"
+    }
+  },
+  {
+    "id": "contact_010",
+    "directory": "Car Rental Customers",
+    "directoryFields": {
+      "name": "Emma Wilson",
+      "email": "emma.wilson@tech.com",
+      "phone": "+1-555-0127",
+      "company": "Wilson Tech",
+      "role": "CTO",
+      "industry": "Technology",
+      "annual_revenue": 180000,
+      "location": "Seattle, Washington",
+      "join_date": "2023-02-15",
+      "segment": "Premium"
+    }
+  }
+]

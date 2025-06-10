@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useRef } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Contact } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -14,10 +16,93 @@ export default function CustomerDirectory() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedContacts, setSelectedContacts] = useState<Set<string>>(new Set());
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: contacts, isLoading } = useQuery<Contact[]>({
     queryKey: ['/api/contacts'],
   });
+
+  const uploadMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('/api/contacts/import', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/contacts'] });
+      setIsImportModalOpen(false);
+      toast({
+        title: "Import Successful",
+        description: data.message,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Import Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
+      setUploadingFile(false);
+    }
+  });
+
+  const handleFileUpload = (file: File) => {
+    if (!file) return;
+    
+    const allowedTypes = ['text/csv', 'application/json'];
+    const isValidType = allowedTypes.includes(file.type) || 
+                       file.name.endsWith('.csv') || 
+                       file.name.endsWith('.json');
+    
+    if (!isValidType) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please upload a CSV or JSON file.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setUploadingFile(true);
+    uploadMutation.mutate(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  };
 
   const filteredContacts = contacts?.filter(contact => {
     const directoryFields = contact.directoryFields as any;
@@ -266,25 +351,53 @@ export default function CustomerDirectory() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Upload File
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <div 
+                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                    isDragOver 
+                      ? 'border-blue-400 bg-blue-50' 
+                      : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv,.json"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file);
+                    }}
+                    className="hidden"
+                  />
+                  <Upload className={`h-8 w-8 mx-auto mb-2 ${isDragOver ? 'text-blue-500' : 'text-gray-400'}`} />
                   <p className="text-sm text-gray-600">
-                    Drop your CSV or JSON file here, or click to browse
+                    {uploadingFile ? 'Uploading...' : 'Drop your CSV or JSON file here, or click to browse'}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    Supports CSV and JSON formats as described in the documentation
+                    Supports CSV and JSON formats with contact information
                   </p>
                 </div>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button 
                   variant="outline" 
-                  onClick={() => setIsImportModalOpen(false)}
+                  onClick={() => {
+                    setIsImportModalOpen(false);
+                    setIsDragOver(false);
+                  }}
+                  disabled={uploadingFile}
                 >
                   Cancel
                 </Button>
-                <Button className="bg-gray-900 hover:bg-gray-800 text-white">
-                  Upload
+                <Button 
+                  className="bg-gray-900 hover:bg-gray-800 text-white"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingFile}
+                >
+                  {uploadingFile ? 'Uploading...' : 'Browse Files'}
                 </Button>
               </div>
             </div>

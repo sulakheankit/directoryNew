@@ -1,0 +1,4 @@
+contact_id,directory,name,first_name,last_name,email,phone,company,role,industry,annual_revenue,location,city,state,join_date,segment
+contact_006,Car Rental Customers,Anna Smith,Anna,Smith,anna.smith@email.com,+1-555-0123,Smith Corp,Manager,Technology,75000,Chicago IL,Chicago,Illinois,2023-01-15,Standard
+contact_007,Car Rental Customers,John Doe,John,Doe,john.doe@company.com,+1-555-0124,Doe Industries,Director,Manufacturing,120000,New York NY,New York,New York,2022-06-10,Premium
+contact_008,Car Rental Customers,Lisa Johnson,Lisa,Johnson,lisa.johnson@business.com,+1-555-0125,Johnson LLC,VP Sales,Sales,95000,Los Angeles CA,Los Angeles,California,2023-03-20,Standard
