@@ -149,51 +149,155 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: "Invalid JSON format: " + (error as Error).message });
         }
       } else if (fileName.endsWith('.csv')) {
-        // Parse CSV file
+        // Parse CSV file with JSON columns
         return new Promise((resolve, reject) => {
           const stream = Readable.from(fileContent);
+          const contactMap = new Map();
+          const activitiesMap = new Map();
+          const surveysMap = new Map();
+          
           stream
             .pipe(csv())
             .on('data', (data) => {
-              // Convert CSV row to contact format
-              const contact = {
-                id: data.contact_id || data.id || `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                directory: data.directory || "Imported Customers",
-                directoryFields: {
-                  name: data.name || `${data.first_name || ''} ${data.last_name || ''}`.trim(),
-                  email: data.email,
-                  phone: data.phone,
-                  company: data.company,
-                  role: data.role,
-                  industry: data.industry,
-                  annual_revenue: data.annual_revenue ? parseInt(data.annual_revenue) : undefined,
-                  location: data.location || `${data.city || ''}, ${data.state || data.state_province || ''}`.trim(),
-                  join_date: data.join_date || data.created_date,
-                  segment: data.segment
+              console.log("Processing CSV row with keys:", Object.keys(data));
+              console.log("Contact ID:", data['Contact ID']);
+              console.log("Directory:", data['Directory']);
+              console.log("Directory Fields raw:", data['Directory Fields (JSONb)']);
+              
+              try {
+                const contactId = data['Contact ID'] || data['contact_id'] || `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                
+                // Parse directory fields from JSON string
+                let directoryFields = {};
+                if (data['Directory Fields (JSONb)']) {
+                  try {
+                    // Handle double-quoted JSON in CSV
+                    const jsonStr = data['Directory Fields (JSONb)'].replace(/^"|"$/g, '');
+                    directoryFields = JSON.parse(jsonStr);
+                    console.log("Successfully parsed directory fields for", contactId, ":", directoryFields);
+                  } catch (e) {
+                    console.log("Error parsing directory fields JSON:", e);
+                    console.log("Raw JSON string:", data['Directory Fields (JSONb)']);
+                  }
                 }
-              };
-              contacts.push(contact);
+                
+                // Only add contact if we haven't seen this contact ID before
+                if (!contactMap.has(contactId)) {
+                  const contact = {
+                    id: contactId,
+                    directory: data['Directory'] || "Imported Customers",
+                    directoryFields: directoryFields
+                  };
+                  contactMap.set(contactId, contact);
+                  console.log("Created CSV contact:", contactId, contact.directory);
+                }
+                
+                // Parse activity data
+                if (data['Activity'] && data['Activity Fields (JSONb)']) {
+                  try {
+                    const activityFields = JSON.parse(data['Activity Fields (JSONb)']);
+                    const activityId = `activity_${contactId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                    
+                    const activityData = {
+                      id: activityId,
+                      contactId: contactId,
+                      activity: data['Activity'],
+                      activityFields: activityFields
+                    };
+                    activitiesMap.set(activityId, activityData);
+                    console.log("Extracted CSV activity:", activityId, data['Activity']);
+                  } catch (e) {
+                    console.log("Error parsing activity fields JSON:", e);
+                  }
+                }
+                
+                // Parse survey data
+                if (data['Survey ID'] && data['Survey Title']) {
+                  try {
+                    const surveyData = {
+                      id: data['Survey ID'],
+                      contactId: contactId,
+                      activityId: null,
+                      surveyTitle: data['Survey Title'],
+                      feedbackRecipient: data['Feedback Recipient (JSONb)'] ? JSON.parse(data['Feedback Recipient (JSONb)']) : null,
+                      channel: data['Channel'] || 'email',
+                      sentAt: data['Sent At'] ? new Date(data['Sent At']) : new Date(),
+                      language: data['Language'] || 'en',
+                      status: data['Status'] || 'completed',
+                      participatedVia: data['Participated Via'] || null,
+                      participatedDate: data['Participated Date'] ? new Date(data['Participated Date']) : null,
+                      surveyResponseLink: data['Survey Response Link'] || null,
+                      metricsAndCustomMetrics: data['Metric and Custom Metric Scores (JSONb)'] ? JSON.parse(data['Metric and Custom Metric Scores (JSONb)']) : null,
+                      driverScores: data['Driver Scores (JSONb)'] ? JSON.parse(data['Driver Scores (JSONb)']) : null,
+                      openEndedSentiment: data['Open-Ended Sentiment'] || null,
+                      openEndedThemes: data['Open-Ended Themes (JSONb)'] ? JSON.parse(data['Open-Ended Themes (JSONb)']) : null,
+                      openEndedEmotions: data['Open-Ended Emotions (JSONb)'] ? JSON.parse(data['Open-Ended Emotions (JSONb)']) : null
+                    };
+                    surveysMap.set(data['Survey ID'], surveyData);
+                    console.log("Extracted CSV survey:", data['Survey ID']);
+                  } catch (e) {
+                    console.log("Error parsing survey data JSON:", e);
+                  }
+                }
+              } catch (error) {
+                console.error("Error processing CSV row:", error);
+              }
             })
             .on('end', async () => {
               try {
+                const contactsArray = Array.from(contactMap.values());
+                const activitiesArray = Array.from(activitiesMap.values());
+                const surveysArray = Array.from(surveysMap.values());
+                
+                console.log(`Processing CSV: ${contactsArray.length} contacts, ${activitiesArray.length} activities, ${surveysArray.length} surveys`);
+                
                 const createdContacts = [];
-                for (const contactData of contacts) {
+                const createdActivities = [];
+                const createdSurveys = [];
+                
+                // Create contacts
+                for (const contactData of contactsArray) {
                   try {
                     const validatedContact = insertContactSchema.parse(contactData);
                     const createdContact = await storage.createContact(validatedContact);
                     createdContacts.push(createdContact);
                   } catch (validationError) {
-                    console.warn("Skipping invalid contact:", validationError);
+                    console.error("Contact validation error:", validationError);
                   }
                 }
+                
+                // Create activities
+                for (const activityData of activitiesArray) {
+                  try {
+                    const validatedActivity = insertActivitySchema.parse(activityData);
+                    const createdActivity = await storage.createActivity(validatedActivity);
+                    createdActivities.push(createdActivity);
+                  } catch (validationError) {
+                    console.error("Activity validation error:", validationError);
+                  }
+                }
+                
+                // Create surveys
+                for (const surveyData of surveysArray) {
+                  try {
+                    const validatedSurvey = insertSurveySchema.parse(surveyData);
+                    const createdSurvey = await storage.createSurvey(validatedSurvey);
+                    createdSurveys.push(createdSurvey);
+                  } catch (validationError) {
+                    console.error("Survey validation error:", validationError);
+                  }
+                }
+                
                 res.json({ 
-                  message: `Successfully imported ${createdContacts.length} contacts`,
+                  message: `Successfully imported ${createdContacts.length} contacts with ${createdActivities.length} activities and ${createdSurveys.length} surveys`,
                   imported: createdContacts.length,
-                  contacts: createdContacts
+                  contacts: createdContacts,
+                  activities: createdActivities,
+                  surveys: createdSurveys
                 });
                 resolve(res);
               } catch (error) {
-                console.error("Error creating contacts:", error);
+                console.error("Error creating contacts from CSV:", error);
                 res.status(500).json({ message: "Error importing contacts" });
                 reject(error);
               }
