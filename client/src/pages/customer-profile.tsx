@@ -32,41 +32,52 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
 
   // Filter contact data based on time filter
   const filteredContact = useMemo(() => {
-    if (!contact) return null;
+    if (!contact) return contact;
 
-    // Simple filtering without type conversions - let components handle date parsing
-    const { start, end } = getDateRangeFromFilter(timeFilter);
-    
-    if (!start && !end) {
-      return contact; // No filtering needed
+    // If "All Time" is selected, return original contact
+    if (timeFilter.type === 'fixed' && timeFilter.range === 'all') {
+      return contact;
+    }
+
+    // Determine date range
+    let startDate: Date | null = null;
+    let endDate: Date | null = null;
+    const now = new Date();
+
+    if (timeFilter.type === 'custom' && timeFilter.startDate && timeFilter.endDate) {
+      startDate = timeFilter.startDate;
+      endDate = timeFilter.endDate;
+    } else if (timeFilter.type === 'rolling') {
+      endDate = now;
+      switch (timeFilter.range) {
+        case 'last_7_days': startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); break;
+        case 'last_14_days': startDate = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000); break;
+        case 'last_30_days': startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); break;
+        case 'last_60_days': startDate = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000); break;
+        case 'last_90_days': startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000); break;
+        case 'last_180_days': startDate = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000); break;
+        case 'last_365_days': startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000); break;
+      }
+    }
+
+    if (!startDate && !endDate) {
+      return contact;
     }
 
     const isInRange = (dateStr: string | Date | null | undefined) => {
       if (!dateStr) return true;
       const date = new Date(dateStr);
-      if (!start && !end) return true;
-      if (!start) return date <= end!;
-      if (!end) return date >= start;
-      return date >= start && date <= end;
+      if (!startDate && !endDate) return true;
+      if (!startDate) return date <= endDate!;
+      if (!endDate) return date >= startDate;
+      return date >= startDate && date <= endDate;
     };
-
-    const filteredActivities = contact.activities.filter(activity => 
-      isInRange(activity.createdAt)
-    );
-
-    const filteredSurveys = contact.surveys.filter(survey => 
-      isInRange(survey.participationDate) || isInRange(survey.sentAt)
-    );
-
-    const filteredNotes = contact.notes.filter(note => 
-      isInRange(note.createdAt)
-    );
 
     return {
       ...contact,
-      activities: filteredActivities,
-      surveys: filteredSurveys,
-      notes: filteredNotes,
+      activities: contact.activities.filter(activity => isInRange(activity.createdAt)),
+      surveys: contact.surveys.filter(survey => isInRange(survey.participationDate) || isInRange(survey.sentAt)),
+      notes: contact.notes.filter(note => isInRange(note.createdAt)),
     };
   }, [contact, timeFilter]);
 
