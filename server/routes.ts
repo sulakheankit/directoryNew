@@ -14,8 +14,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       fileSize: 10 * 1024 * 1024, // 10MB limit
     },
     fileFilter: (req, file, cb) => {
-      const allowedMimes = ['text/csv', 'application/json', 'text/plain'];
-      if (allowedMimes.includes(file.mimetype) || file.originalname.endsWith('.csv') || file.originalname.endsWith('.json')) {
+      const allowedMimes = ['text/csv', 'application/json', 'text/plain', 'application/octet-stream'];
+      const allowedExtensions = ['.csv', '.json'];
+      const hasValidMime = allowedMimes.includes(file.mimetype);
+      const hasValidExtension = allowedExtensions.some(ext => file.originalname.toLowerCase().endsWith(ext));
+      
+      if (hasValidMime || hasValidExtension) {
         cb(null, true);
       } else {
         cb(new Error('Only CSV and JSON files are allowed'));
@@ -57,17 +61,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const fileContent = req.file.buffer.toString('utf8');
       const contacts: any[] = [];
+      const fileName = req.file.originalname.toLowerCase();
 
-      if (req.file.originalname.endsWith('.json')) {
+      if (fileName.endsWith('.json')) {
         // Parse JSON file
         try {
           const jsonData = JSON.parse(fileContent);
           const contactsArray = Array.isArray(jsonData) ? jsonData : [jsonData];
-          contacts.push(...contactsArray);
+          
+          // Transform the data format and extract unique contacts
+          const contactMap = new Map();
+          
+          for (const item of contactsArray) {
+            const contactId = item.contact_id || item.id || `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
+            // Only add if we haven't seen this contact ID before
+            if (!contactMap.has(contactId)) {
+              const contact = {
+                id: contactId,
+                directory: item.directory || "Imported Customers",
+                directoryFields: item.directory_fields || item.directoryFields || {
+                  name: item.name,
+                  email: item.email,
+                  phone: item.phone,
+                  company: item.company,
+                  role: item.role,
+                  industry: item.industry,
+                  annual_revenue: item.annual_revenue,
+                  location: item.location,
+                  join_date: item.join_date,
+                  segment: item.segment
+                }
+              };
+              contactMap.set(contactId, contact);
+            }
+          }
+          
+          // Convert map values to array
+          contacts.push(...Array.from(contactMap.values()));
         } catch (error) {
-          return res.status(400).json({ message: "Invalid JSON format" });
+          console.error("JSON parsing error:", error);
+          return res.status(400).json({ message: "Invalid JSON format: " + (error as Error).message });
         }
-      } else if (req.file.originalname.endsWith('.csv')) {
+      } else if (fileName.endsWith('.csv')) {
         // Parse CSV file
         return new Promise((resolve, reject) => {
           const stream = Readable.from(fileContent);
@@ -124,11 +160,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
         });
       } else {
-        return res.status(400).json({ message: "Unsupported file format" });
+        return res.status(400).json({ message: "Unsupported file format. Please upload a CSV or JSON file." });
       }
 
       // Handle JSON import
-      if (req.file.originalname.endsWith('.json')) {
+      if (fileName.endsWith('.json')) {
         const createdContacts = [];
         for (const contactData of contacts) {
           try {
