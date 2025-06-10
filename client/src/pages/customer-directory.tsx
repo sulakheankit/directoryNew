@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, Upload, Download, MoreVertical, User } from "lucide-react";
+import { Search, Filter, Upload, Download, MoreVertical, User, Trash2 } from "lucide-react";
 import { Link } from "wouter";
 
 export default function CustomerDirectory() {
@@ -189,6 +189,16 @@ export default function CustomerDirectory() {
             <Button variant="outline" size="sm">
               <Download className="h-4 w-4 mr-2" />
               Export
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => deleteAllMutation.mutate()}
+              disabled={deleteAllMutation.isPending || !contacts || contacts.length === 0}
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              {deleteAllMutation.isPending ? 'Deleting...' : 'Delete All'}
             </Button>
             <Button 
               onClick={() => setIsImportModalOpen(true)}
