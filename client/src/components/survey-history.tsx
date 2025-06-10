@@ -159,21 +159,21 @@ export default function SurveyHistory({ contact }: SurveyHistoryProps) {
                     {getStatusBadge(survey.status)}
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    {(survey as any).metricsAndCustomMetrics ? (
+                    {survey.metricScores ? (
                       <div className="flex space-x-2">
-                        {(survey as any).metricsAndCustomMetrics.nps_score && (
+                        {(survey.metricScores as any).nps_score && (
                           <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            NPS: {(survey as any).metricsAndCustomMetrics.nps_score}
+                            NPS: {(survey.metricScores as any).nps_score}
                           </Badge>
                         )}
-                        {(survey as any).metricsAndCustomMetrics.csat_score && (
+                        {(survey.metricScores as any).csat_score && (
                           <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                            CSAT: {(survey as any).metricsAndCustomMetrics.csat_score}
+                            CSAT: {(survey.metricScores as any).csat_score}
                           </Badge>
                         )}
-                        {(survey as any).metricsAndCustomMetrics.ease_of_purchase && (
+                        {(survey.metricScores as any).ease_of_purchase && (
                           <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                            EOP: {(survey as any).metricsAndCustomMetrics.ease_of_purchase}
+                            EOP: {(survey.metricScores as any).ease_of_purchase}
                           </Badge>
                         )}
                       </div>

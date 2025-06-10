@@ -248,7 +248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                       participatedVia: data['Participated Via'] || null,
                       participatedDate: data['Participated Date'] ? new Date(data['Participated Date']) : null,
                       surveyResponseLink: data['Survey Response Link'] || null,
-                      metricsAndCustomMetrics: data['Metric and Custom Metric Scores (JSONb)'] ? parseJsonField(data['Metric and Custom Metric Scores (JSONb)']) : null,
+                      metricScores: data['Metric and Custom Metric Scores (JSONb)'] ? parseJsonField(data['Metric and Custom Metric Scores (JSONb)']) : null,
                       driverScores: data['Driver Scores (JSONb)'] ? parseJsonField(data['Driver Scores (JSONb)']) : null,
                       openEndedSentiment: data['Open-Ended Sentiment'] || null,
                       openEndedThemes: data['Open-Ended Themes (JSONb)'] ? parseJsonField(data['Open-Ended Themes (JSONb)']) : null,

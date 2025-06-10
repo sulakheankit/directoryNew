@@ -214,36 +214,41 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                   <TrendingUp className="h-5 w-5 text-gray-400" />
                 </div>
                 <div className="space-y-2">
-                  {contact.surveys.length > 0 && contact.surveys.find(s => s.status === 'completed') ? (
-                    (() => {
-                      const completedSurvey = contact.surveys.find(s => s.status === 'completed');
-                      const metrics = (completedSurvey as any)?.metricsAndCustomMetrics;
-                      return (
-                        <>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">NPS</span>
-                            <span className="text-lg font-semibold text-gray-900">
-                              {metrics?.nps_score || 'N/A'}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">CSAT</span>
-                            <span className="text-lg font-semibold text-gray-900">
-                              {metrics?.csat_score || 'N/A'}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Ease of Purchase</span>
-                            <span className="text-lg font-semibold text-gray-900">
-                              {metrics?.ease_of_purchase || 'N/A'}
-                            </span>
-                          </div>
-                        </>
-                      );
-                    })()
-                  ) : (
-                    <p className="text-sm text-gray-500">No completed surveys</p>
-                  )}
+                  {(() => {
+                    // Find the most recent completed survey with metrics
+                    const completedSurvey = contact.surveys
+                      .filter(s => s.status === 'Completed' || s.status === 'completed')
+                      .find(s => s.metricScores);
+                    
+                    if (!completedSurvey) {
+                      return <p className="text-sm text-gray-500">No completed surveys with scores</p>;
+                    }
+                    
+                    const metrics = completedSurvey.metricScores as any;
+                    
+                    return (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">NPS</span>
+                          <span className="text-lg font-semibold text-gray-900">
+                            {metrics?.nps_score || metrics?.nps || 'N/A'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">CSAT</span>
+                          <span className="text-lg font-semibold text-gray-900">
+                            {metrics?.csat_score || metrics?.csat || 'N/A'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Ease of Purchase</span>
+                          <span className="text-lg font-semibold text-gray-900">
+                            {metrics?.ease_of_purchase || metrics?.eop || 'N/A'}
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </CardContent>
             </Card>
