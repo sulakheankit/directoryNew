@@ -8,7 +8,6 @@ import SurveyHistory from "@/components/survey-history";
 import NLPInsights from "@/components/nlp-insights";
 import NotesSection from "@/components/notes-section";
 import TimeFilter, { TimeFilterValue } from "@/components/time-filter";
-import { getDateRangeFromFilter } from "@/lib/time-filter-utils";
 import { ArrowLeft, Mail, MoreVertical, User, Phone, MapPin, Building, Briefcase, DollarSign, Calendar, X, Plus, Tag, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,7 +46,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
   };
 
   // Define available contact fields
-  const contactFields = [
+  const contactFields = contact ? [
     { key: 'email', label: 'Email', icon: Mail, value: (contact?.directoryFields as any)?.email },
     { key: 'phone', label: 'Phone', icon: Phone, value: (contact?.directoryFields as any)?.phone },
     { key: 'location', label: 'Location', icon: MapPin, value: (contact?.directoryFields as any)?.location },
@@ -57,7 +56,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
     { key: 'annual_revenue', label: 'Annual Revenue', icon: DollarSign, value: (contact?.directoryFields as any)?.annual_revenue ? `$${(contact.directoryFields as any).annual_revenue.toLocaleString()}` : null },
     { key: 'segment', label: 'Segment', icon: User, value: (contact?.directoryFields as any)?.segment },
     { key: 'join_date', label: 'Join Date', icon: Calendar, value: (contact?.directoryFields as any)?.join_date },
-  ].filter(field => field.value); // Only show fields with values
+  ].filter(field => field.value) : []; // Only show fields with values
 
   // Filter contact data based on time filter
   const filteredContact = useMemo(() => {
@@ -77,42 +76,42 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
       startDate = timeFilter.startDate;
       endDate = timeFilter.endDate;
     } else if (timeFilter.type === 'rolling') {
+      const days = parseInt(timeFilter.range);
+      startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
       endDate = now;
-      switch (timeFilter.range) {
-        case 'last_7_days': startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); break;
-        case 'last_14_days': startDate = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000); break;
-        case 'last_30_days': startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); break;
-        case 'last_60_days': startDate = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000); break;
-        case 'last_90_days': startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000); break;
-        case 'last_180_days': startDate = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000); break;
-        case 'last_365_days': startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000); break;
-      }
+    } else if (timeFilter.type === 'fixed' && timeFilter.range !== 'all') {
+      const days = parseInt(timeFilter.range);
+      startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+      endDate = now;
     }
 
-    if (!startDate && !endDate) {
-      return contact;
-    }
+    // Filter activities, surveys, and notes
+    const filteredActivities = contact.activities.filter(activity => {
+      const activityDate = new Date(activity.createdAt);
+      return (!startDate || activityDate >= startDate) && (!endDate || activityDate <= endDate);
+    });
 
-    const isInRange = (dateStr: string | Date | null | undefined) => {
-      if (!dateStr) return true;
-      const date = new Date(dateStr);
-      if (!startDate && !endDate) return true;
-      if (!startDate) return date <= endDate!;
-      if (!endDate) return date >= startDate;
-      return date >= startDate && date <= endDate;
-    };
+    const filteredSurveys = contact.surveys.filter(survey => {
+      const surveyDate = new Date(survey.createdAt);
+      return (!startDate || surveyDate >= startDate) && (!endDate || surveyDate <= endDate);
+    });
+
+    const filteredNotes = contact.notes.filter(note => {
+      const noteDate = new Date(note.createdAt);
+      return (!startDate || noteDate >= startDate) && (!endDate || noteDate <= endDate);
+    });
 
     return {
       ...contact,
-      activities: contact.activities.filter(activity => isInRange(activity.createdAt)),
-      surveys: contact.surveys.filter(survey => isInRange(survey.participationDate) || isInRange(survey.sentAt)),
-      notes: contact.notes.filter(note => isInRange(note.createdAt)),
+      activities: filteredActivities,
+      surveys: filteredSurveys,
+      notes: filteredNotes,
     };
   }, [contact, timeFilter]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gray-50">
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="px-6 py-4 flex items-center justify-between">
             <div className="flex items-center">
@@ -148,7 +147,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
 
   if (error || !contact) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gray-50">
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="px-6 py-4 flex items-center justify-between">
             <div className="flex items-center">
@@ -329,7 +328,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                     <div>
                       <p className="text-xs text-gray-500 mb-1">CSAT Score</p>
                       <p className="text-lg font-bold text-gray-900">
-                        {filteredContact.surveys.length > 0 
+                        {filteredContact?.surveys.length > 0 
                           ? ((filteredContact.surveys[0] as any).metricScores?.csat_score || 'N/A')
                           : 'N/A'
                         }
@@ -338,7 +337,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Effort Score</p>
                       <p className="text-lg font-bold text-gray-900">
-                        {filteredContact.surveys.length > 0 
+                        {filteredContact?.surveys.length > 0 
                           ? ((filteredContact.surveys[0] as any).metricScores?.effort_score || 'N/A')
                           : 'N/A'
                         }
@@ -347,7 +346,7 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Resolution Rating</p>
                       <p className="text-lg font-bold text-gray-900">
-                        {filteredContact.surveys.length > 0 
+                        {filteredContact?.surveys.length > 0 
                           ? ((filteredContact.surveys[0] as any).metricScores?.escalation_handling || 'N/A')
                           : 'N/A'
                         }
@@ -378,124 +377,23 @@ export default function CustomerProfile({ contactId }: CustomerProfileProps) {
                 </TabsList>
 
                 <TabsContent value="activity" className="space-y-6 mt-6">
-                  <ActivityTimeline contact={filteredContact} />
+                  {filteredContact && <ActivityTimeline contact={filteredContact} />}
                 </TabsContent>
 
                 <TabsContent value="surveys" className="space-y-6 mt-6">
-                  <SurveyHistory contact={filteredContact} />
+                  {filteredContact && <SurveyHistory contact={filteredContact} />}
                 </TabsContent>
 
                 <TabsContent value="insights" className="space-y-6 mt-6">
-                  <NLPInsights contact={filteredContact} />
+                  {filteredContact && <NLPInsights contact={filteredContact} />}
                 </TabsContent>
 
                 <TabsContent value="notes" className="space-y-6 mt-6">
-                  <NotesSection contact={filteredContact} />
+                  {filteredContact && <NotesSection contact={filteredContact} />}
                 </TabsContent>
               </Tabs>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
-  );
-              <TabsList className="grid w-full grid-cols-5 bg-gray-50">
-                <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-gray-900">
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger value="activity" className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-gray-900">
-                  Activity Timeline
-                </TabsTrigger>
-                <TabsTrigger value="surveys" className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-gray-900">
-                  Survey History
-                </TabsTrigger>
-                <TabsTrigger value="insights" className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-gray-900">
-                  NLP Insights
-                </TabsTrigger>
-                <TabsTrigger value="notes" className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-gray-900">
-                  Notes
-                </TabsTrigger>
-              </TabsList>
-
-              <div className="p-6">
-                <TabsContent value="overview" className="mt-0">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Contact Details */}
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Details</h3>
-                      <div className="space-y-4">
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-sm font-medium text-gray-700">Industry</span>
-                          <span className="text-sm text-gray-600">{directoryFields.industry}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-sm font-medium text-gray-700">Annual Revenue</span>
-                          <span className="text-sm text-gray-600">${directoryFields.annual_revenue?.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-sm font-medium text-gray-700">Segment</span>
-                          <span className="text-sm text-gray-600">{directoryFields.segment}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                          <span className="text-sm font-medium text-gray-700">Join Date</span>
-                          <span className="text-sm text-gray-600">
-                            {new Date(directoryFields.join_date).toLocaleDateString('en-US', { 
-                              year: 'numeric', 
-                              month: 'long', 
-                              day: 'numeric' 
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Recent Activity */}
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
-                      <div className="space-y-4">
-                        {(filteredContact?.activities || []).slice(0, 3).map((activity) => (
-                          <div key={activity.id} className="flex items-start space-x-3">
-                            <div className="flex-shrink-0">
-                              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center border border-gray-300">
-                                <Mail className="h-4 w-4 text-gray-600" />
-                              </div>
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium text-gray-900">{activity.activity}</p>
-                              <p className="text-xs text-gray-500">
-                                {new Date(activity.createdAt).toLocaleDateString('en-US', { 
-                                  month: 'short', 
-                                  day: 'numeric' 
-                                })} - {new Date(activity.createdAt).toLocaleDateString('en-US', { 
-                                  weekday: 'long' 
-                                })}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="activity" className="mt-0">
-                  {filteredContact && <ActivityTimeline contact={filteredContact} />}
-                </TabsContent>
-
-                <TabsContent value="surveys" className="mt-0">
-                  {filteredContact && <SurveyHistory contact={filteredContact} />}
-                </TabsContent>
-
-                <TabsContent value="insights" className="mt-0">
-                  {filteredContact && <NLPInsights contact={filteredContact} />}
-                </TabsContent>
-
-                <TabsContent value="notes" className="mt-0">
-                  {filteredContact && <NotesSection contact={filteredContact} />}
-                </TabsContent>
-              </div>
-            </Tabs>
-          </Card>
         </div>
       </main>
     </div>
