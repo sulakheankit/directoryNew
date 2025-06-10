@@ -207,7 +207,7 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
                         {item.details.surveys.map((survey: any, index: number) => (
                           <div key={survey.id} className="border border-gray-200 rounded-lg p-3 mb-2 last:mb-0">
                             <div className="flex items-center justify-between mb-2">
-                              <h6 className="text-sm font-medium text-gray-800">{survey.title}</h6>
+                              <h6 className="text-sm font-medium text-gray-800">{survey.surveyTitle}</h6>
                               <Badge className={
                                 survey.status === 'Completed' || survey.status === 'completed' 
                                   ? 'bg-green-100 text-green-800' 
@@ -223,20 +223,22 @@ export default function ActivityTimeline({ contact }: ActivityTimelineProps) {
                                   <span className="text-gray-500 ml-1">{survey.channel}</span>
                                 </div>
                               )}
-                              {survey.responseTime && (
+                              {survey.participationDate && (
                                 <div>
                                   <span className="font-medium text-gray-600">Response Time:</span>
-                                  <span className="text-gray-500 ml-1">{survey.responseTime}</span>
+                                  <span className="text-gray-500 ml-1">
+                                    {Math.round((new Date(survey.participationDate).getTime() - new Date(survey.sentAt).getTime()) / (1000 * 60 * 60))} hours
+                                  </span>
                                 </div>
                               )}
-                              {survey.sentiment && (
+                              {survey.openEndedSentiment && (
                                 <div>
                                   <span className="font-medium text-gray-600">Sentiment:</span>
                                   <span className={`ml-1 font-medium ${
-                                    survey.sentiment === 'positive' ? 'text-green-600' :
-                                    survey.sentiment === 'negative' ? 'text-red-600' : 'text-yellow-600'
+                                    survey.openEndedSentiment === 'positive' ? 'text-green-600' :
+                                    survey.openEndedSentiment === 'negative' ? 'text-red-600' : 'text-yellow-600'
                                   }`}>
-                                    {survey.sentiment.charAt(0).toUpperCase() + survey.sentiment.slice(1)}
+                                    {survey.openEndedSentiment.charAt(0).toUpperCase() + survey.openEndedSentiment.slice(1)}
                                   </span>
                                 </div>
                               )}
